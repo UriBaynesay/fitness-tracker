@@ -1,0 +1,9 @@
+# Dev-only, merged automatically by a plain `docker compose up` (deploy.sh names
+# docker-compose.yml explicitly, so this never reaches production).
+#
+# Dev runs the API and web on the host (`npm run dev`); only Postgres is a
+# container, published on 5433 so it doesn't collide with diet-helper's 5432.
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5433:5432"

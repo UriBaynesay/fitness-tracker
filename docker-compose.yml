@@ -1,0 +1,43 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      # Loopback-only: nginx (host-native, see infra/CLAUDE.md) is the sole public
+      # entrypoint. Docker's own iptables rules bypass ufw for published ports, so
+      # the 127.0.0.1 bind is what actually keeps this off the internet.
+      - "127.0.0.1:3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      # Postgres is reached over the compose network by service name.
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      # Safe only because the port above is loopback-only behind nginx.
+      TRUST_PROXY: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # The service must stay named "postgres" with POSTGRES_USER / POSTGRES_DB set:
+  # infra/backup/pg-backup.sh dumps through `docker compose exec postgres`.
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      # postgres:18+ manages a version-named subdirectory under /var/lib/postgresql.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

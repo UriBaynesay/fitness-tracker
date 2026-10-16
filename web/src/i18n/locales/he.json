@@ -1,0 +1,36 @@
+{
+  "app": { "name": "מעקב כושר" },
+  "loading": "טוען…",
+  "language": { "label": "שפה", "en": "English", "he": "עברית" },
+  "auth": {
+    "loginTitle": "התחברות",
+    "registerTitle": "יצירת חשבון",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "passwordHint": "לפחות 10 תווים",
+    "displayName": "שם (אופציונלי)",
+    "loginSubmit": "התחברות",
+    "registerSubmit": "יצירת חשבון",
+    "submitting": "רגע…",
+    "noAccount": "אין לך חשבון?",
+    "haveAccount": "כבר יש לך חשבון?",
+    "toRegister": "יצירת חשבון",
+    "toLogin": "התחברות",
+    "logout": "התנתקות",
+    "errors": {
+      "invalid_credentials": "אימייל או סיסמה שגויים.",
+      "email_taken": "האימייל הזה כבר רשום.",
+      "validation_error": "יש לבדוק את השדות ולנסות שוב.",
+      "rate_limited": "יותר מדי ניסיונות. יש להמתין דקה ולנסות שוב.",
+      "network": "אין חיבור לשרת. יש לבדוק את החיבור.",
+      "generic": "משהו השתבש. יש לנסות שוב.",
+      "passwordTooShort": "יש להשתמש ב-10 תווים לפחות."
+    }
+  },
+  "home": {
+    "title": "היום",
+    "welcome": "ברוכים הבאים, {{name}}",
+    "signedInAs": "מחובר כ-{{email}}",
+    "placeholder": "התוכניות והאימונים שלך יופיעו כאן."
+  }
+}
