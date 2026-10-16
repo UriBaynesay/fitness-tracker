@@ -83,6 +83,9 @@ a {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
+  /* Emails and names have no break opportunities; let them wrap instead of
+     spilling out of the card. */
+  overflow-wrap: anywhere;
 }
 
 .form {
@@ -167,6 +170,13 @@ a:focus-visible {
 .muted {
   margin: 0;
   color: var(--text-muted);
+}
+
+/* Links inside running text still need the 44px minimum touch target. */
+.muted a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
 }
 
 .welcome {

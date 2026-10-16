@@ -72,6 +72,13 @@ re-argued like any other decision in this project.
   behave differently there (diet-helper's `sharp` bug).
 - Dev: `docker compose up -d postgres` (published on `127.0.0.1:5433`), then
   `npm run dev` on the host. Do not containerize the dev servers.
+- UI verification: Playwright is installed **globally** on the owner's machine
+  (not a dependency of this repo; browsers are in the shared per-user cache).
+  Drive the built app (`npm run build`, then `node api/dist/server.js` with a
+  matching `ALLOWED_ORIGINS`) from a throwaway CommonJS script run as
+  `NODE_PATH="$(npm root -g)" node script.cjs`, take mobile-size (390x844)
+  screenshots and look at them. This caught a real RTL overflow and a sub-44px
+  link in milestone 1 that type-checks and unit tests could not.
 
 ## Status
 

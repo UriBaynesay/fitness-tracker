@@ -29,8 +29,9 @@
   },
   "home": {
     "title": "Today",
-    "welcome": "Welcome, {{name}}",
-    "signedInAs": "Signed in as {{email}}",
+    "welcome": "Welcome",
+    "welcomeName": "Welcome, <name>{{name}}</name>",
+    "signedInAs": "Signed in as <email>{{email}}</email>",
     "placeholder": "Your plans and workouts will show up here."
   }
 }

@@ -14,8 +14,8 @@ describe("translations", () => {
     expect(keys(he).sort()).toEqual(keys(en).sort());
   });
 
-  it("uses the same interpolation placeholders in both languages", () => {
-    const placeholders = (text: string) => (text.match(/{{\w+}}/g) ?? []).sort();
+  it("uses the same interpolation placeholders and inline tags in both languages", () => {
+    const placeholders = (text: string) => (text.match(/{{\w+}}|<\/?\w+>/g) ?? []).sort();
     const flat = (value: unknown, prefix = ""): [string, string][] =>
       typeof value === "string"
         ? [[prefix, value]]

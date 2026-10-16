@@ -29,8 +29,9 @@
   },
   "home": {
     "title": "היום",
-    "welcome": "ברוכים הבאים, {{name}}",
-    "signedInAs": "מחובר כ-{{email}}",
+    "welcome": "ברוכים הבאים",
+    "welcomeName": "ברוכים הבאים, <name>{{name}}</name>",
+    "signedInAs": "מחובר בתור <email>{{email}}</email>",
     "placeholder": "התוכניות והאימונים שלך יופיעו כאן."
   }
 }
