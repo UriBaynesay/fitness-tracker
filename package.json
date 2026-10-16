@@ -1,0 +1,24 @@
+{
+  "name": "fitness-tracker",
+  "private": true,
+  "type": "module",
+  "workspaces": ["shared", "api", "web"],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w api && npm run build -w web",
+    "dev": "npm run build -w shared && concurrently -n shared,api,web -c gray,blue,green \"npm run dev -w shared\" \"npm run dev -w api\" \"npm run dev -w web\"",
+    "test": "npm run build -w shared && npm test -w api && npm test -w web",
+    "typecheck": "npm run build -w shared && npm run typecheck -w api && npm run typecheck -w web",
+    "db:generate": "npm run db:generate -w api",
+    "db:migrate": "npm run db:migrate -w api"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "concurrently": "^9.2.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

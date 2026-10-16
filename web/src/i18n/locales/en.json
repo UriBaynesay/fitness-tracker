@@ -1,0 +1,37 @@
+{
+  "app": { "name": "Fitness Tracker" },
+  "loading": "Loading…",
+  "language": { "label": "Language", "en": "English", "he": "עברית" },
+  "auth": {
+    "loginTitle": "Log in",
+    "registerTitle": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 10 characters",
+    "displayName": "Name (optional)",
+    "loginSubmit": "Log in",
+    "registerSubmit": "Create account",
+    "submitting": "Please wait…",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "toRegister": "Create one",
+    "toLogin": "Log in",
+    "logout": "Log out",
+    "errors": {
+      "invalid_credentials": "Wrong email or password.",
+      "email_taken": "That email is already registered.",
+      "validation_error": "Please check the fields and try again.",
+      "rate_limited": "Too many attempts. Wait a minute and try again.",
+      "network": "Can't reach the server. Check your connection.",
+      "generic": "Something went wrong. Try again.",
+      "passwordTooShort": "Use at least 10 characters."
+    }
+  },
+  "home": {
+    "title": "Today",
+    "welcome": "Welcome",
+    "welcomeName": "Welcome, <name>{{name}}</name>",
+    "signedInAs": "Signed in as <email>{{email}}</email>",
+    "placeholder": "Your plans and workouts will show up here."
+  }
+}
