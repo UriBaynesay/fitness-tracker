@@ -1,0 +1,35 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-16T09:10:00Z"},
+  "title": "Fitness Tracker Mobile UI",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "Today"},
+    "Session.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "Live workout"},
+    "Rest.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "Rest timer"},
+    "Session-he.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "Live workout (Hebrew, RTL)"},
+    "Plan.dc.html": {"x": 0, "y": 964, "w": 390, "h": 844, "title": "Plan editor"},
+    "Goals.dc.html": {"x": 470, "y": 964, "w": 390, "h": 844, "title": "Goals"},
+    "History.dc.html": {"x": 940, "y": 964, "w": 390, "h": 844, "title": "Exercise history"},
+    "Settings.dc.html": {"x": 1410, "y": 964, "w": 390, "h": 844, "title": "Settings"},
+    "AddExercise.dc.html": {"x": 0, "y": 1928, "w": 390, "h": 844, "title": "Add exercise"},
+    "Plan-failure.dc.html": {"x": 470, "y": 1928, "w": 390, "h": 844, "title": "Plan editor: last set to failure"}
+  },
+  "order": [
+    "Main.dc.html",
+    "Session.dc.html",
+    "Rest.dc.html",
+    "Session-he.dc.html",
+    "Plan.dc.html",
+    "Goals.dc.html",
+    "History.dc.html",
+    "Settings.dc.html",
+    "AddExercise.dc.html",
+    "Plan-failure.dc.html"
+  ],
+  "notes": {
+    "title-main": {"x": 0, "y": -300, "text": "Fitness Tracker: mobile screens", "kind": "title1", "maxW": 1800}
+  },
+  "designSystems": []
+}

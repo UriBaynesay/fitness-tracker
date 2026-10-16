@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;background:#101216;color:#F3F4F1;font-family:'Barlow',system-ui,sans-serif;overflow:hidden">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:28px 20px 12px 20px">
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="font-size:13px;font-weight:500;letter-spacing:1.5px;color:#9AA0AB">FRI 16 OCT</div>
+      <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;line-height:1;text-transform:uppercase">Today</h1>
+    </div>
+    <button aria-label="Account and settings" style="width:44px;height:44px;border-radius:22px;border:1px solid #2C313B;background:#1A1D23;color:#F3F4F1;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+    </button>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:8px 20px 0 20px;min-height:0">
+    <div style="background:#1A1D23;border:1px solid #2C313B;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">CURRENT PLAN · PUSH / PULL / LEGS</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:700;line-height:1;text-transform:uppercase">Push day</div>
+      <div style="display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;height:40px;border-top:1px solid #2C313B;font-size:16px"><span>Barbell Bench Press</span><span style="color:#9AA0AB">4 × 8</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;height:40px;border-top:1px solid #2C313B;font-size:16px"><span>Incline Dumbbell Press</span><span style="color:#9AA0AB">3 × 12</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;height:40px;border-top:1px solid #2C313B;font-size:16px"><span>Overhead Press</span><span style="color:#9AA0AB">3 × 10</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;height:36px;border-top:1px solid #2C313B;font-size:14px;color:#9AA0AB"><span>+ 2 more exercises</span></div>
+      </div>
+      <button style="height:56px;border:0;border-radius:14px;background:#C8F135;color:#101216;font-family:inherit;font-size:18px;font-weight:600;cursor:pointer">Start workout</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">THIS WEEK</div>
+      <div style="display:flex;justify-content:space-between">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>S</span><span style="width:40px;height:40px;border-radius:20px;background:#C8F135"></span><span style="font-size:12px;font-weight:500;color:#F3F4F1">Push</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>M</span><span style="width:40px;height:40px;border-radius:20px;background:#232730"></span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>T</span><span style="width:40px;height:40px;border-radius:20px;background:#C8F135"></span><span style="font-size:12px;font-weight:500;color:#F3F4F1">Pull</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>W</span><span style="width:40px;height:40px;border-radius:20px;background:#232730"></span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>T</span><span style="width:40px;height:40px;border-radius:20px;background:#C8F135"></span><span style="font-size:12px;font-weight:500;color:#F3F4F1">Legs</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#F3F4F1;font-weight:600"><span>F</span><span style="width:36px;height:36px;border-radius:20px;border:2px solid #C8F135;background:transparent"></span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#9AA0AB"><span>S</span><span style="width:40px;height:40px;border-radius:20px;background:#232730"></span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">TODAY'S TARGETS</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:#1A1D23;border:1px solid #2C313B">
+        <div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:16px;font-weight:500">Barbell Bench Press</span><span style="font-size:13px;color:#9AA0AB">Last time 80 kg × 8</span></div>
+        <span style="font-size:17px;font-weight:600;color:#C8F135">82.5 kg × 8</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:#1A1D23;border:1px solid #2C313B">
+        <div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:16px;font-weight:500">Incline Dumbbell Press</span><span style="font-size:13px;color:#9AA0AB">Last time 24 kg × 12</span></div>
+        <span style="font-size:17px;font-weight:600;color:#C8F135">26 kg × 12</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:#1A1D23;border:1px solid #2C313B">
+        <div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:16px;font-weight:500">Overhead Press</span><span style="font-size:13px;color:#9AA0AB">Last time 45 kg × 9</span></div>
+        <span style="font-size:17px;font-weight:600;color:#C8F135">45 kg × 10</span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display:flex;height:76px;box-sizing:border-box;border-top:1px solid #2C313B;background:#101216;padding:0 8px">
+    <button style="flex:1;background:none;border:0;color:#C8F135;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Today</button>
+    <button style="flex:1;background:none;border:0;color:#9AA0AB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Plans</button>
+    <button style="flex:1;background:none;border:0;color:#9AA0AB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/></svg>Progress</button>
+    <button style="flex:1;background:none;border:0;color:#9AA0AB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.5"/></svg>Goals</button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;background:#101216;color:#F3F4F1;font-family:'Barlow',system-ui,sans-serif;overflow:hidden">
+  <div style="display:flex;flex-direction:column;gap:4px;padding:16px 12px 12px 12px">
+    <a href="Main.dc.html" style="display:flex;align-items:center;height:44px;padding:0 8px;font-size:16px;font-weight:500;color:#9AA0AB;text-decoration:none">← Back</a>
+    <h1 style="margin:0;padding:0 8px;font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;line-height:1;text-transform:uppercase">Settings</h1>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;gap:22px;padding:12px 20px 0 20px;min-height:0">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">LANGUAGE</div>
+      <div style="display:flex;padding:4px;border-radius:12px;background:#1A1D23;gap:4px;border:1px solid #2C313B">
+        <button style="flex:1;height:44px;border:0;border-radius:9px;background:#C8F135;color:#101216;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer">English</button>
+        <button style="flex:1;height:44px;border:0;border-radius:9px;background:transparent;color:#F3F4F1;font-family:inherit;font-size:16px;font-weight:500;cursor:pointer">עברית</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">WEIGHT UNIT</div>
+      <div style="display:flex;padding:4px;border-radius:12px;background:#1A1D23;gap:4px;border:1px solid #2C313B">
+        <button style="flex:1;height:44px;border:0;border-radius:9px;background:#C8F135;color:#101216;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer">kg</button>
+        <button style="flex:1;height:44px;border:0;border-radius:9px;background:transparent;color:#F3F4F1;font-family:inherit;font-size:16px;font-weight:500;cursor:pointer">lb</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">WORKOUT</div>
+      <div style="display:flex;flex-direction:column;border-radius:14px;background:#1A1D23;border:1px solid #2C313B">
+        <div style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px">
+          <span style="font-size:17px">Sound when rest ends</span>
+          <button role="switch" aria-checked="true" aria-label="Sound when rest ends" style="position:relative;width:52px;height:32px;border-radius:16px;border:0;background:#C8F135;cursor:pointer"><span style="position:absolute;top:4px;left:24px;width:24px;height:24px;border-radius:12px;background:#101216"></span></button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px;border-top:1px solid #2C313B">
+          <span style="font-size:17px">Vibrate when rest ends</span>
+          <button role="switch" aria-checked="true" aria-label="Vibrate when rest ends" style="position:relative;width:52px;height:32px;border-radius:16px;border:0;background:#C8F135;cursor:pointer"><span style="position:absolute;top:4px;left:24px;width:24px;height:24px;border-radius:12px;background:#101216"></span></button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px;border-top:1px solid #2C313B">
+          <span style="font-size:17px">Keep screen on during workouts</span>
+          <button role="switch" aria-checked="false" aria-label="Keep screen on during workouts" style="position:relative;width:52px;height:32px;border-radius:16px;border:0;background:#232730;cursor:pointer"><span style="position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:12px;background:#9AA0AB"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;color:#9AA0AB">ACCOUNT</div>
+      <div style="display:flex;flex-direction:column;border-radius:14px;background:#1A1D23;border:1px solid #2C313B">
+        <div style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 16px"><span style="font-size:17px">Email</span><span style="font-size:16px;color:#9AA0AB">[your email]</span></div>
+        <button style="display:flex;align-items:center;height:60px;padding:0 16px;border:0;border-top:1px solid #2C313B;background:none;color:#F3F4F1;font-family:inherit;font-size:17px;cursor:pointer">Log out</button>
+        <button style="display:flex;align-items:center;height:60px;padding:0 16px;border:0;border-top:1px solid #2C313B;background:none;color:#FF8A80;font-family:inherit;font-size:17px;cursor:pointer">Delete account and all data</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
