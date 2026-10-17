@@ -109,6 +109,12 @@ local-first (workout lives in IndexedDB via Dexie, pushed through the idempotent
 Today screen with plan rotation and week strip, guided set logging, rest timer from
 an end timestamp, resume after reload, skip/reorder/add mid-workout, summary. Device
 alert settings (sound, vibration, keep screen on) are per device in localStorage.
+Milestone 4 (PWA) is built on `feature/m4-pwa`: vite-plugin-pwa/Workbox precaches the
+whole build and answers navigations with index.html (never `/api`; API data is cached by
+the app itself in IndexedDB), installable manifest + icons (`web/public`, rendered from
+`icon.svg`), cold start offline keeps the last profile (`auth/offline.ts`), failed uploads
+retry with backoff (5 s, 30 s, 2 min, 5 min), storage persistence is requested when a
+workout starts.
 The owner deploys once, after the whole app is finished (no per-milestone deploys).
 See `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach

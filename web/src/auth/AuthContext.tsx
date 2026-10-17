@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { LoginBody, Profile, RegisterInput, UpdateMeInput } from "@fitness/shared";
-import { api } from "../api";
+import { ApiError, api } from "../api";
+import { readCache, removeCache, writeCache } from "../session/store";
+import { profileAfterFailure } from "./offline";
 import { setLanguage } from "../i18n";
 
 type AuthState =
@@ -17,6 +19,8 @@ interface AuthContextValue {
   updateProfile: (body: UpdateMeInput) => Promise<void>;
 }
 
+const LAST_PROFILE_KEY = "lastProfile";
+
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -25,6 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const authenticate = useCallback(async (profile: Profile) => {
     // After login the account's saved language wins over the pre-login toggle.
     await setLanguage(profile.language);
+    // Remembered so the app can still open when the next start has no network.
+    void writeCache(LAST_PROFILE_KEY, profile).catch(() => undefined);
     setState({ status: "authenticated", profile });
   }, []);
 
@@ -37,8 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ profile }) => {
         if (!cancelled) void authenticate(profile);
       })
-      .catch(() => {
-        if (!cancelled) setState({ status: "anonymous" });
+      .catch(async (error: unknown) => {
+        // No connection (or a dead server) is not "signed out": open with the profile
+        // this device last saw, so a workout can be logged at a gym with no signal.
+        const remembered = await readCache<Profile>(LAST_PROFILE_KEY).catch(() => undefined);
+        if (cancelled) return;
+        const offline = profileAfterFailure(error, remembered);
+        if (offline) {
+          void authenticate(offline);
+          return;
+        }
+        if (error instanceof ApiError && error.status === 401) void removeCache(LAST_PROFILE_KEY).catch(() => undefined);
+        setState({ status: "anonymous" });
       });
     return () => {
       cancelled = true;
@@ -52,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register: async (body) => authenticate((await api.register(body)).profile),
       logout: async () => {
         await api.logout();
+        void removeCache(LAST_PROFILE_KEY).catch(() => undefined);
         setState({ status: "anonymous" });
       },
       updateProfile: async (body) => authenticate((await api.updateMe(body)).profile),

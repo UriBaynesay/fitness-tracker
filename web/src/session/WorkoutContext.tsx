@@ -80,6 +80,9 @@ export function WorkoutProvider({ children }: { children: ReactNode }) {
       latest.current = doc;
       setActive(doc);
       persist(doc);
+      // The unsynced workout is the only copy until it uploads, so ask the browser not
+      // to evict this site's storage under disk pressure. Best effort: it may refuse.
+      void navigator.storage?.persist?.().catch(() => undefined);
       await writes.current;
     },
     [persist]

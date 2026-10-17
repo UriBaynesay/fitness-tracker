@@ -1,9 +1,9 @@
 import "fake-indexeddb/auto";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api";
 import { completeSet, discard, finish, startEmpty } from "./logic";
 import { database, getActiveWorkout, getWorkout, listDirtyWorkouts, markSynced, readCache, saveWorkout, writeCache } from "./store";
-import { syncPending } from "./sync";
+import { retryDelayMs, syncPending } from "./sync";
 
 const put = vi.fn();
 const remove = vi.fn();
@@ -149,3 +149,58 @@ function completeSetIntoExercise(doc: ReturnType<typeof workout>) {
   };
   return completeSet(withExercise, 0, { weightKg: 50, reps: 10, durationSeconds: null }, { now: new Date(), newId });
 }
+
+describe("retrying by itself", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("backs off 5 s, 30 s, 2 min, then 5 min forever", () => {
+    expect([0, 1, 2, 3, 4, 10].map(retryDelayMs)).toEqual([5_000, 30_000, 120_000, 300_000, 300_000, 300_000]);
+    expect(retryDelayMs(-1)).toBe(5_000);
+  });
+
+  it("delivers a workout after the network comes back, with nobody touching the app", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    await saveWorkout(workout("pr"));
+    put.mockRejectedValue(new ApiError(0, "network"));
+    await syncPending("pr");
+    expect(put).toHaveBeenCalledTimes(1);
+
+    // Still down at the first retry (5 s) and the second (30 s)...
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(put).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(29_000);
+    expect(put).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(put).toHaveBeenCalledTimes(3);
+
+    // ...then it works again: the next retry delivers and the timer stops.
+    put.mockResolvedValue({});
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(put).toHaveBeenCalledTimes(4);
+    expect(await listDirtyWorkouts("pr")).toEqual([]);
+    await vi.advanceTimersByTimeAsync(600_000);
+    expect(put).toHaveBeenCalledTimes(4);
+  });
+
+  it("a trigger from the app tries immediately and restarts the backoff", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    await saveWorkout(workout("pt"));
+    put.mockRejectedValue(new ApiError(503, "generic"));
+    await syncPending("pt");
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(put).toHaveBeenCalledTimes(2);
+    await syncPending("pt");
+    expect(put).toHaveBeenCalledTimes(3);
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(put).toHaveBeenCalledTimes(4);
+  });
+
+  it("does not retry when signed out", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    await saveWorkout(workout("pu"));
+    put.mockRejectedValue(new ApiError(401, "unauthorized"));
+    await syncPending("pu");
+    await vi.advanceTimersByTimeAsync(600_000);
+    expect(put).toHaveBeenCalledTimes(1);
+  });
+});
