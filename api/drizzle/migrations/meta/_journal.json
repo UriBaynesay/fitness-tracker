@@ -15,6 +15,13 @@
       "when": 1792261797264,
       "tag": "0001_opposite_johnny_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792266466691,
+      "tag": "0002_lush_mercury",
+      "breakpoints": true
     }
   ]
 }

@@ -123,6 +123,10 @@ describe("a user who is not signed in", () => {
     ["PATCH", () => `/api/v1/plan-exercises/${ids.planExerciseId}`],
     ["DELETE", () => `/api/v1/plan-exercises/${ids.planExerciseId}`],
     ["PATCH", () => "/api/v1/me"],
+    ["PUT", () => `/api/v1/sessions/${zeroId}`],
+    ["DELETE", () => `/api/v1/sessions/${zeroId}`],
+    ["GET", () => "/api/v1/sessions"],
+    ["GET", () => `/api/v1/exercises/history?ids=${zeroId}`],
   ];
 
   it.each(routes)("gets 401 from %s %s", async (method, url) => {
@@ -130,6 +134,61 @@ describe("a user who is not signed in", () => {
     const res = await call(t.app, method, url(), undefined, method === "GET" ? undefined : {});
     expect(res.statusCode).toBe(401);
     expect(await aliceSnapshot()).toEqual(before);
+  });
+});
+
+describe("workouts belong to their owner", () => {
+  const workout = (exerciseId: string, clientId: string) => ({
+    clientId,
+    planDayId: null,
+    planDayName: null,
+    startedAt: new Date(Date.now() - 3_600_000).toISOString(),
+    endedAt: new Date().toISOString(),
+    exercises: [
+      {
+        clientId: "11111111-1111-4111-8111-111111111111",
+        exerciseId,
+        position: 0,
+        skipped: false,
+        targetSets: 3,
+        targetReps: 10,
+        targetDurationSeconds: null,
+        restSeconds: 90,
+        progressionMode: "target",
+        failureTargetReps: null,
+        sessionsToConfirm: 2,
+        weightStepKg: 2.5,
+        sets: [{ clientId: "22222222-2222-4222-8222-222222222222", setNumber: 1, weightKg: 50, reps: 10, durationSeconds: null, toFailure: false, completedAt: new Date().toISOString() }],
+      },
+    ],
+  });
+  const sameId = "33333333-3333-4333-8333-333333333333";
+
+  it("the same client id from two users makes two separate workouts", async () => {
+    const lib = await libraryExercise(t.app, alice, false);
+    await call(t.app, "PUT", `/api/v1/sessions/${sameId}`, alice, workout(lib.id, sameId));
+    await call(t.app, "PUT", `/api/v1/sessions/${sameId}`, bob, workout(lib.id, sameId));
+    expect((await call(t.app, "GET", "/api/v1/sessions", alice)).json().sessions).toHaveLength(1);
+    expect((await call(t.app, "GET", "/api/v1/sessions", bob)).json().sessions).toHaveLength(1);
+  });
+
+  it("another user's workouts never show in lists or history, and cannot be deleted", async () => {
+    const lib = await libraryExercise(t.app, alice, false);
+    await call(t.app, "PUT", `/api/v1/sessions/${sameId}`, alice, workout(lib.id, sameId));
+
+    expect((await call(t.app, "GET", "/api/v1/sessions", bob)).json().sessions).toEqual([]);
+    const history = (await call(t.app, "GET", `/api/v1/exercises/history?ids=${lib.id}`, bob)).json().history;
+    expect(history[0].sessions).toEqual([]);
+
+    expect((await call(t.app, "DELETE", `/api/v1/sessions/${sameId}`, bob)).statusCode).toBe(204);
+    expect((await call(t.app, "GET", "/api/v1/sessions", alice)).json().sessions).toHaveLength(1);
+  });
+
+  it("another user's custom exercise is not usable in a workout and has no history", async () => {
+    const res = await call(t.app, "PUT", `/api/v1/sessions/${sameId}`, bob, workout(ids.customExerciseId, sameId));
+    expect(res.statusCode).toBe(400);
+    const history = (await call(t.app, "GET", `/api/v1/exercises/history?ids=${ids.customExerciseId}`, bob)).json().history;
+    expect(history).toEqual([]);
   });
 });
 
