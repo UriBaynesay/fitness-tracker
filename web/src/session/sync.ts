@@ -3,14 +3,40 @@ import { toSyncDocument } from "./logic";
 import { listDirtyWorkouts, markSynced, removeWorkout } from "./store";
 
 // Pushes every workout with unsent changes to the server. The upload is idempotent
-// (PUT by client id), so this can run as often as it likes: after each change, when
-// the app starts, when the browser reports it is back online. Failures are silent and
-// simply retried by the next trigger. A status indicator and backoff are milestone 4.
+// (PUT by client id), so this can run as often as it likes. It runs after each change,
+// when the app starts, and when the browser says it is back online or visible again
+// (see WorkoutContext). If an attempt fails for a reason that may pass (no signal, a
+// server hiccup), it also retries by itself with growing delays, so a workout
+// finished in a basement gym reaches the server without anyone touching the app.
+
+const RETRY_DELAYS_MS = [5_000, 30_000, 120_000, 300_000];
+
+// attempt 0 is the first retry. The last delay repeats forever.
+export function retryDelayMs(attempt: number): number {
+  return RETRY_DELAYS_MS[Math.min(Math.max(0, attempt), RETRY_DELAYS_MS.length - 1)]!;
+}
+
+type Outcome = "done" | "retry" | "stop";
 
 let running: Promise<void> | null = null;
 let again = false;
+let attempt = 0;
+let timer: ReturnType<typeof setTimeout> | null = null;
 
+function clearRetry(): void {
+  if (timer !== null) clearTimeout(timer);
+  timer = null;
+}
+
+// A trigger from the app (a change, reconnecting, coming back to the app): try now,
+// and forget how long we had been backing off.
 export function syncPending(profileId: string): Promise<void> {
+  attempt = 0;
+  clearRetry();
+  return run(profileId);
+}
+
+function run(profileId: string): Promise<void> {
   // One run at a time. A request that arrives mid-run asks for one more pass, so
   // edits made during an upload are not forgotten.
   if (running) {
@@ -19,10 +45,13 @@ export function syncPending(profileId: string): Promise<void> {
   }
   running = (async () => {
     try {
+      let outcome: Outcome;
       do {
         again = false;
-        await pushAll(profileId);
+        outcome = await pushAll(profileId);
       } while (again);
+      if (outcome === "retry") scheduleRetry(profileId);
+      else attempt = 0;
     } finally {
       running = null;
     }
@@ -30,7 +59,17 @@ export function syncPending(profileId: string): Promise<void> {
   return running;
 }
 
-async function pushAll(profileId: string): Promise<void> {
+function scheduleRetry(profileId: string): void {
+  clearRetry();
+  timer = setTimeout(() => {
+    timer = null;
+    attempt += 1;
+    void run(profileId);
+  }, retryDelayMs(attempt));
+}
+
+async function pushAll(profileId: string): Promise<Outcome> {
+  let outcome: Outcome = "done";
   for (const doc of await listDirtyWorkouts(profileId)) {
     try {
       if (doc.status === "discarded") {
@@ -41,13 +80,15 @@ async function pushAll(profileId: string): Promise<void> {
         await markSynced(doc.clientId, doc.rev);
       }
     } catch (error) {
-      // Offline, signed out, rate limited or a server hiccup: stop and try again later.
-      if (error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 401 && error.status !== 429) {
-        // The server will never accept this document as it is. Retrying forever would
-        // block the rest, so skip it; it stays on the device.
-        continue;
-      }
-      return;
+      if (!(error instanceof ApiError)) return "retry";
+      // Signed out: nothing to retry until they sign in again (that triggers a sync).
+      if (error.status === 401) return "stop";
+      // Offline, rate limited or a server error: may pass, so stop and back off.
+      if (error.status === 0 || error.status === 429 || error.status >= 500) return "retry";
+      // The server will never accept this document as it is. Skip it so it does not
+      // block the rest; it stays on the device.
+      outcome = "done";
     }
   }
+  return outcome;
 }

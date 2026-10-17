@@ -77,3 +77,7 @@ export async function writeCache(key: string, value: unknown): Promise<void> {
 export async function readCache<T>(key: string): Promise<T | undefined> {
   return (await database.cache.get(key))?.value as T | undefined;
 }
+
+export async function removeCache(key: string): Promise<void> {
+  await database.cache.delete(key);
+}
