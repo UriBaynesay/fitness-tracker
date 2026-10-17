@@ -115,6 +115,14 @@ the app itself in IndexedDB), installable manifest + icons (`web/public`, render
 `icon.svg`), cold start offline keeps the last profile (`auth/offline.ts`), failed uploads
 retry with backoff (5 s, 30 s, 2 min, 5 min), storage persistence is requested when a
 workout starts.
+Milestone 5 (hints and progress) is built on `feature/m5-hints`: the overload rule is one
+pure function (`shared/src/hints.ts`, deload / add weight / one more rep / failure-set
+rules; "failure goal reached in N sessions" counts only sessions at the same weight, our
+assumption), computed once when a workout starts from the last 3 sessions and used to
+prefill the steppers (after a set the weight follows what was actually lifted). Progress
+screen (`/progress`, lazy-loaded Recharts chart, Weight / Reps / Est. 1RM / Duration, recent
+workouts) reads `GET /exercises/:id/history` and `GET /exercises/trained`; hint numbers
+are isolated left-to-right inside Hebrew sentences.
 The owner deploys once, after the whole app is finished (no per-milestone deploys).
 See `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach

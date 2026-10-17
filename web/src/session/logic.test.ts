@@ -68,7 +68,7 @@ describe("starting", () => {
     const a = planExercise(1);
     const b = planExercise(0);
     const previous = [{ weightKg: 60, reps: 8, durationSeconds: null, toFailure: false }];
-    const doc = start([a, b], new Map([[a.exercise.id, previous]]));
+    const doc = start([a, b], new Map([[a.exercise.id, [previous]]]));
     expect(doc.exercises.map((e) => e.exerciseId)).toEqual([b.exercise.id, a.exercise.id]);
     expect(doc.exercises[1]).toMatchObject({ targetSets: 3, restSeconds: 90, nameEn: "Exercise 1", previous, sets: [] });
     expect(doc).toMatchObject({ status: "active", planDayName: "Push", endedAt: null, rest: null, dirty: true });
@@ -210,6 +210,49 @@ describe("prefill", () => {
   });
 });
 
+describe("overload hint", () => {
+  const sets = (weightKg: number, ...reps: number[]) => reps.map((r) => ({ weightKg, reps: r, durationSeconds: null, toFailure: false }));
+
+  it("is worked out when the workout starts, from the last sessions", () => {
+    const a = planExercise(0, { targetSets: 3 });
+    const doc = start([a], new Map([[a.exercise.id, [sets(60, 10, 10, 10)]]]));
+    expect(doc.exercises[0]!.hint).toEqual({ kind: "addWeight", weightKg: 62.5, reps: 10, setNumber: null });
+    expect(doc.exercises[0]!.recent).toHaveLength(1);
+  });
+
+  it("is null without history", () => {
+    expect(start([planExercise(0)]).exercises[0]!.hint).toBeNull();
+  });
+
+  it("fills the steppers: new weight everywhere, the extra rep only on the weakest set", () => {
+    const a = planExercise(0, { targetSets: 3 });
+    const exercise = start([a], new Map([[a.exercise.id, [sets(60, 10, 8, 10)]]])).exercises[0]!;
+    expect([0, 1, 2].map((i) => prefill(exercise, i))).toEqual([
+      { weightKg: 60, reps: 10, durationSeconds: null },
+      { weightKg: 60, reps: 9, durationSeconds: null },
+      { weightKg: 60, reps: 10, durationSeconds: null },
+    ]);
+  });
+
+  it("the weight follows what was actually lifted once a set is done", () => {
+    const a = planExercise(0, { targetSets: 3 });
+    let doc = start([a], new Map([[a.exercise.id, [sets(60, 10, 10, 10)]]]));
+    expect(prefill(doc.exercises[0]!, 0).weightKg).toBe(62.5);
+    doc = completeSet(doc, 0, reps(60, 9), ctx(1));
+    expect(prefill(doc.exercises[0]!, 1)).toMatchObject({ weightKg: 60, reps: 10 });
+  });
+
+  it("an added exercise gets a hint from its history too", () => {
+    const doc = addExercise(
+      startEmpty({ profileId: "p", now: T0, newId: uuid }),
+      { exerciseId: uuid(), nameEn: "Curl", nameHe: null, isTimed: false },
+      { unit: "kg", newId: uuid, recent: [sets(20, 10, 10, 10)] }
+    );
+    expect(doc.exercises[0]!.hint).toMatchObject({ kind: "addWeight", weightKg: 22.5 });
+    expect(doc.exercises[0]!.previous).toHaveLength(3);
+  });
+});
+
 describe("changing the workout", () => {
   it("moves exercises and stops at the ends", () => {
     const doc = start([planExercise(0), planExercise(1), planExercise(2)]);
@@ -222,7 +265,7 @@ describe("changing the workout", () => {
     const doc = addExercise(
       startEmpty({ profileId: "p", now: T0, newId: uuid }),
       { exerciseId: uuid(), nameEn: "Curl", nameHe: null, isTimed: false },
-      { unit: "lb", newId: uuid, previous: [] }
+      { unit: "lb", newId: uuid, recent: [] }
     );
     expect(doc.exercises).toHaveLength(1);
     expect(doc.exercises[0]).toMatchObject({ targetSets: 3, targetReps: 10, restSeconds: 90, skipped: false, sets: [] });
@@ -232,7 +275,7 @@ describe("changing the workout", () => {
   it("refuses to add past the limit", () => {
     let doc = startEmpty({ profileId: "p", now: T0, newId: uuid });
     for (let i = 0; i < 31; i++) {
-      doc = addExercise(doc, { exerciseId: uuid(), nameEn: "X", nameHe: null, isTimed: false }, { unit: "kg", newId: uuid, previous: [] });
+      doc = addExercise(doc, { exerciseId: uuid(), nameEn: "X", nameHe: null, isTimed: false }, { unit: "kg", newId: uuid, recent: [] });
     }
     expect(doc.exercises).toHaveLength(30);
   });

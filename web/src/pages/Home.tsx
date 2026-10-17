@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { exerciseName, nextDayAfter, type HistorySet, type Language, type PlanDay } from "@fitness/shared";
+import { exerciseName, nextDayAfter, overloadHint, type HistorySet, type Language, type PlanDay } from "@fitness/shared";
 import { useAuth } from "../auth/AuthContext";
 import { UserIcon } from "../components/icons";
 import { Screen } from "../components/Screen";
+import { hintShort } from "../lib/hints";
 import { setText } from "../lib/format";
 import { loadHistory, loadToday, type TodayData } from "../session/data";
 import { newId } from "../session/ids";
@@ -30,7 +31,7 @@ export function Home() {
   const [local, setLocal] = useState<WorkoutDoc[]>([]);
   const [chosenDayId, setChosenDayId] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
-  const [history, setHistory] = useState<Map<string, HistorySet[]>>(new Map());
+  const [history, setHistory] = useState<Map<string, HistorySet[][]>>(new Map());
   const [starting, setStarting] = useState(false);
 
   const profileId = state.status === "authenticated" ? state.profile.id : null;
@@ -247,7 +248,9 @@ export function Home() {
           </h2>
           <ul className="list">
             {day.exercises.map((item) => {
-              const last = history.get(item.exercise.id) ?? [];
+              const recent = history.get(item.exercise.id) ?? [];
+              const last = recent[0] ?? [];
+              const hint = overloadHint(item, recent);
               return (
                 <li key={item.id} className="card stack target-row">
                   <strong dir="auto">{exerciseName(item.exercise, language as Language)}</strong>
@@ -265,6 +268,11 @@ export function Home() {
                       </bdi>
                     )}
                   </span>
+                  {hint && (
+                    <span className="hint-line" dir="auto">
+                      {t("hint.try")}: <bdi dir="ltr">{hintShort(hint, unit)}</bdi>
+                    </span>
+                  )}
                 </li>
               );
             })}

@@ -2,6 +2,8 @@ import {
   MAX_SESSION_EXERCISES,
   MAX_SETS_PER_EXERCISE,
   defaultPlanExerciseConfig,
+  hintValues,
+  overloadHint,
   type HistorySet,
   type PlanDay,
   type PlanExerciseConfig,
@@ -38,24 +40,29 @@ interface StartContext {
   profileId: string;
   now: Date;
   newId: NewId;
-  // Last finished sets per exercise id.
-  history: Map<string, HistorySet[]>;
+  // The last few finished workouts' sets per exercise id, newest first.
+  history: Map<string, HistorySet[][]>;
 }
 
 export function startFromDay(day: PlanDay, context: StartContext): WorkoutDoc {
   const exercises: WorkoutExercise[] = [...day.exercises]
     .sort((a, b) => a.position - b.position)
-    .map((item) => ({
-      ...configOf(item),
-      clientId: context.newId(),
-      exerciseId: item.exercise.id,
-      nameEn: item.exercise.nameEn,
-      nameHe: item.exercise.nameHe,
-      isTimed: item.exercise.isTimed,
-      skipped: false,
-      sets: [],
-      previous: context.history.get(item.exercise.id) ?? [],
-    }));
+    .map((item) => {
+      const recent = context.history.get(item.exercise.id) ?? [];
+      return {
+        ...configOf(item),
+        clientId: context.newId(),
+        exerciseId: item.exercise.id,
+        nameEn: item.exercise.nameEn,
+        nameHe: item.exercise.nameHe,
+        isTimed: item.exercise.isTimed,
+        skipped: false,
+        sets: [],
+        previous: recent[0] ?? [],
+        recent,
+        hint: overloadHint(item, recent),
+      };
+    });
   return blank(context, day.id, day.name, exercises);
 }
 
@@ -114,9 +121,11 @@ export function totalSets(doc: WorkoutDoc): { done: number; planned: number } {
 
 // ---- prefill ----------------------------------------------------------------
 
-// What the steppers should show for a set: the set just done in this workout, else
-// the same set number last time, else the plan's target. Weight has no target, so a
-// brand-new exercise starts empty (0) and the person types their first weight.
+// What the steppers should show for a set. With an overload hint: its weight and reps
+// (the weight follows what was actually lifted once a set is done). Otherwise the set
+// just done in this workout, else the same set number last time, else the plan's
+// target. Weight has no target, so a brand-new exercise starts at 0 and the person
+// types their first weight.
 export function prefill(exercise: WorkoutExercise, setIndex: number): SetValues {
   if (exercise.isTimed) {
     const lastDone = exercise.sets.at(-1);
@@ -128,6 +137,10 @@ export function prefill(exercise: WorkoutExercise, setIndex: number): SetValues 
     };
   }
   const lastDone = exercise.sets.at(-1);
+  if (exercise.hint && exercise.targetReps !== null) {
+    const suggested = hintValues(exercise.hint, setIndex, { targetReps: exercise.targetReps, targetSets: exercise.targetSets });
+    return { weightKg: lastDone?.weightKg ?? suggested.weightKg, reps: suggested.reps, durationSeconds: null };
+  }
   const before = exercise.previous[setIndex] ?? exercise.previous.at(-1);
   return {
     weightKg: lastDone?.weightKg ?? before?.weightKg ?? 0,
@@ -207,16 +220,19 @@ export function canAddExercise(doc: WorkoutDoc): boolean {
 export function addExercise(
   doc: WorkoutDoc,
   info: ExerciseInfo,
-  context: { unit: WeightUnit; newId: NewId; previous: HistorySet[] }
+  context: { unit: WeightUnit; newId: NewId; recent: HistorySet[][] }
 ): WorkoutDoc {
   if (!canAddExercise(doc)) return doc;
+  const config = defaultPlanExerciseConfig(info.isTimed, context.unit);
   const added: WorkoutExercise = {
-    ...defaultPlanExerciseConfig(info.isTimed, context.unit),
+    ...config,
     ...info,
     clientId: context.newId(),
     skipped: false,
     sets: [],
-    previous: context.previous,
+    previous: context.recent[0] ?? [],
+    recent: context.recent,
+    hint: overloadHint(config, context.recent),
   };
   return touch(doc, { exercises: [...doc.exercises, added], rest: null });
 }

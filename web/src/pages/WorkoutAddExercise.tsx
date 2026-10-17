@@ -24,12 +24,12 @@ export function WorkoutAddExercise() {
       idleLabel={t("addExercise.addDisabled")}
       canConfirm={ready && active !== null}
       onConfirm={async (exercise) => {
-        const previous = (await loadHistory(profileId, [exercise.id])).get(exercise.id) ?? [];
+        const recent = (await loadHistory(profileId, [exercise.id])).get(exercise.id) ?? [];
         update((doc) =>
           addExercise(
             doc,
             { exerciseId: exercise.id, nameEn: exercise.nameEn, nameHe: exercise.nameHe, isTimed: exercise.isTimed },
-            { unit: weightUnit, newId, previous }
+            { unit: weightUnit, newId, recent }
           )
         );
         navigate("/workout");

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "./auth/AuthContext";
@@ -13,12 +13,21 @@ import { Workout } from "./pages/Workout";
 import { WorkoutAddExercise } from "./pages/WorkoutAddExercise";
 import { WorkoutSummary } from "./pages/WorkoutSummary";
 
+// The chart library is large and only this screen needs it, so it loads on demand.
+// The service worker precaches the chunk, so it still opens offline.
+const Progress = lazy(() => import("./pages/Progress").then((module) => ({ default: module.Progress })));
+
 function RequireAuth({ children }: { children: ReactNode }) {
   const { state } = useAuth();
   const { t } = useTranslation();
   if (state.status === "loading") return <p className="status">{t("loading")}</p>;
   if (state.status === "anonymous") return <Navigate to="/login" replace />;
   return children;
+}
+
+function LoadingStatus() {
+  const { t } = useTranslation();
+  return <p className="status">{t("loading")}</p>;
 }
 
 const protectedRoute = (element: ReactNode) => <RequireAuth>{element}</RequireAuth>;
@@ -35,6 +44,14 @@ export function App() {
       <Route path="/workout" element={protectedRoute(<Workout />)} />
       <Route path="/workout/add-exercise" element={protectedRoute(<WorkoutAddExercise />)} />
       <Route path="/workout/summary/:clientId" element={protectedRoute(<WorkoutSummary />)} />
+      <Route
+        path="/progress"
+        element={protectedRoute(
+          <Suspense fallback={<LoadingStatus />}>
+            <Progress />
+          </Suspense>
+        )}
+      />
       <Route path="/settings" element={protectedRoute(<Settings />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
