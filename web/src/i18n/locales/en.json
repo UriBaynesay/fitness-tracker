@@ -2,7 +2,7 @@
   "app": { "name": "Fitness Tracker" },
   "loading": "Loading…",
   "language": { "label": "Language", "en": "English", "he": "עברית" },
-  "nav": { "main": "Main navigation", "today": "Today", "plans": "Plans", "progress": "Progress" },
+  "nav": { "main": "Main navigation", "today": "Today", "plans": "Plans", "progress": "Progress", "goals": "Goals" },
   "common": {
     "cancel": "Cancel",
     "back": "Back",
@@ -185,6 +185,38 @@
     "noData": "Nothing to chart for this measure yet.",
     "empty": "No finished workouts yet. Log one and your progress will show up here.",
     "recent": "Recent workouts"
+  },
+  "goals": {
+    "title": "Goals",
+    "empty": "No goals yet. Pick an exercise and a target to aim for.",
+    "add": "+ Add goal",
+    "newTitle": "New goal",
+    "exercise": "Exercise",
+    "chooseExercise": "Choose an exercise",
+    "measure": "Measure",
+    "metric": { "weight": "Weight", "reps": "Reps", "duration": "Duration" },
+    "target": "Target",
+    "newTarget": "New target",
+    "create": "Create goal",
+    "save": "Save target",
+    "edit": "Edit target",
+    "delete": "Delete",
+    "confirmDelete": "Delete this goal?",
+    "best": "Best so far",
+    "goal": "Goal",
+    "start": "Started at",
+    "progress": "Progress toward the goal",
+    "reached": "Reached",
+    "seconds": "seconds",
+    "reps": "reps",
+    "errors": {
+      "goal_exists": "You already have a goal for that exercise and measure.",
+      "target_not_above_start": "The target must be higher than where you started.",
+      "metric_mismatch": "That measure doesn't fit this exercise.",
+      "limit_reached": "You've reached the limit of goals.",
+      "unknown_exercise": "That exercise isn't available.",
+      "validation_error": "Enter a number above zero."
+    }
   },
   "workout": {
     "exit": "Exit",

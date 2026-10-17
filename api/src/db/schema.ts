@@ -12,7 +12,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { EQUIPMENT, MUSCLE_GROUPS, PROGRESSION_MODES } from "@fitness/shared";
+import { EQUIPMENT, GOAL_METRICS, MUSCLE_GROUPS, PROGRESSION_MODES } from "@fitness/shared";
 
 // Renders ['a', 'b'] as 'a', 'b' for a CHECK ... IN (...). The lists are constants
 // from the shared package, so one source of truth feeds the API, the UI and the DB.
@@ -291,3 +291,32 @@ export const setLogs = pgTable(
     check("set_logs_reps_xor_duration_check", sql`(${t.reps} is null) <> (${t.durationSeconds} is null)`),
   ]
 );
+
+// ---- goals -----------------------------------------------------------------
+
+export const goals = pgTable(
+  "goals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    // Same deferred check as plan_exercises (hand-edited into the migration).
+    exerciseId: uuid("exercise_id")
+      .notNull()
+      .references(() => exercises.id),
+    metric: text("metric").notNull(),
+    // Weights in kg, durations in seconds, reps as a count. No status column: whether
+    // a goal is reached is worked out from the sessions every time it is read.
+    startValue: numeric("start_value", { precision: 8, scale: 3 }).notNull(),
+    targetValue: numeric("target_value", { precision: 8, scale: 3 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("goals_profile_exercise_metric_idx").on(t.profileId, t.exerciseId, t.metric),
+    check("goals_metric_check", sql`${t.metric} in (${inList(GOAL_METRICS)})`),
+    check("goals_values_check", sql`${t.startValue} >= 0 and ${t.targetValue} > ${t.startValue}`),
+  ]
+);
+
+export type GoalRow = typeof goals.$inferSelect;

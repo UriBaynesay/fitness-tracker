@@ -1,4 +1,4 @@
-import type { Exercise, ExerciseHistory, HistorySet, Plan, SessionSummary } from "@fitness/shared";
+import type { Exercise, ExerciseHistory, Goal, HistorySet, Plan, SessionSummary } from "@fitness/shared";
 import { api } from "../api";
 import { readCache, writeCache } from "./store";
 
@@ -75,6 +75,11 @@ async function withCache<T>(key: string, load: () => Promise<T>): Promise<T> {
     throw error;
   }
 }
+
+// After a change the device copy is rewritten too, so an offline open matches the server.
+export const rememberGoals = (profileId: string, goals: Goal[]) => writeCache(`${profileId}:goals`, goals);
+
+export const loadGoals = (profileId: string) => withCache(`${profileId}:goals`, async () => (await api.goals.list()).goals);
 
 export const loadTrained = (profileId: string) =>
   withCache(`${profileId}:trained`, async () => (await api.exercises.trained()).exerciseIds);

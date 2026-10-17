@@ -129,6 +129,10 @@ describe("a user who is not signed in", () => {
     ["GET", () => `/api/v1/exercises/history?ids=${zeroId}`],
     ["GET", () => "/api/v1/exercises/trained"],
     ["GET", () => `/api/v1/exercises/${zeroId}/history`],
+    ["GET", () => "/api/v1/goals"],
+    ["POST", () => "/api/v1/goals"],
+    ["PATCH", () => `/api/v1/goals/${zeroId}`],
+    ["DELETE", () => `/api/v1/goals/${zeroId}`],
   ];
 
   it.each(routes)("gets 401 from %s %s", async (method, url) => {
@@ -200,6 +204,25 @@ describe("workouts belong to their owner", () => {
     expect(res.statusCode).toBe(400);
     const history = (await call(t.app, "GET", `/api/v1/exercises/history?ids=${ids.customExerciseId}`, bob)).json().history;
     expect(history).toEqual([]);
+  });
+});
+
+describe("goals belong to their owner", () => {
+  it("another user's goal is invisible and cannot be changed or deleted", async () => {
+    const lib = await libraryExercise(t.app, alice, false);
+    const { goal } = (await call(t.app, "POST", "/api/v1/goals", alice, { exerciseId: lib.id, metric: "weight", target: 100 })).json();
+
+    expect((await call(t.app, "GET", "/api/v1/goals", bob)).json().goals).toEqual([]);
+    expect((await call(t.app, "PATCH", `/api/v1/goals/${goal.id}`, bob, { target: 5 })).statusCode).toBe(404);
+    expect((await call(t.app, "DELETE", `/api/v1/goals/${goal.id}`, bob)).statusCode).toBe(204);
+    const after = (await call(t.app, "GET", "/api/v1/goals", alice)).json().goals;
+    expect(after).toHaveLength(1);
+    expect(after[0].targetValue).toBe(100);
+  });
+
+  it("another user's custom exercise cannot be the subject of a goal", async () => {
+    const res = await call(t.app, "POST", "/api/v1/goals", bob, { exerciseId: ids.customExerciseId, metric: "weight", target: 100 });
+    expect(res.statusCode).toBe(400);
   });
 });
 

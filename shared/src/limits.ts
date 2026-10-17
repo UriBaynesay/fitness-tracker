@@ -7,3 +7,4 @@ export const MAX_CUSTOM_EXERCISES_PER_PROFILE = 100;
 // A synced workout is one document; these bound its size.
 export const MAX_SESSION_EXERCISES = 30;
 export const MAX_SETS_PER_EXERCISE = 40;
+export const MAX_GOALS_PER_PROFILE = 30;
