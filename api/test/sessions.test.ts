@@ -25,7 +25,8 @@ beforeEach(async () => {
 
 const minutesAgo = (n: number) => new Date(Date.now() - n * 60_000).toISOString();
 
-function entry(exercise: Exercise, position: number, sets = 2, overrides: Record<string, unknown> = {}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function entry(exercise: Exercise, position: number, sets = 2, overrides: Record<string, unknown> = {}): any {
   return {
     ...defaultPlanExerciseConfig(exercise.isTimed, "kg"),
     clientId: randomUUID(),
@@ -46,7 +47,7 @@ function doc(exerciseEntries: unknown[], overrides: Record<string, unknown> = {}
   return { clientId, planDayId: null, planDayName: "Push", startedAt: minutesAgo(60), endedAt: minutesAgo(1), exercises: exerciseEntries, ...overrides };
 }
 
-const put = (as: string | undefined, body: { clientId: string }) =>
+const put = (as: string | undefined, body: { clientId: string } & Record<string, unknown>) =>
   call(t.app, "PUT", `/api/v1/sessions/${body.clientId}`, as, body);
 const list = async (as = token, query = "") => (await call(t.app, "GET", `/api/v1/sessions${query}`, as)).json().sessions;
 const history = async (ids: string[], limit = 3, as = token) =>
@@ -211,7 +212,7 @@ describe("exercise history", () => {
     await put(token, doc([entry(bench, 0, 2, { skipped: true })]));
 
     const [result] = await history([bench.id], 3);
-    expect(result.sessions.map((s: { sets: { weightKg: number }[] }) => s.sets[0].weightKg)).toEqual([75, 70, 65]);
+    expect(result.sessions.map((s: { sets: { weightKg: number }[] }) => s.sets[0]!.weightKg)).toEqual([75, 70, 65]);
 
     const [one] = await history([bench.id], 1);
     expect(one.sessions).toHaveLength(1);

@@ -37,7 +37,7 @@ const aliceExercises = async () => (await call(t.app, "GET", "/api/v1/exercises"
 const zeroId = "00000000-0000-4000-8000-000000000000";
 
 describe("a user cannot reach another user's plans", () => {
-  const attempts: [string, "GET" | "PATCH" | "DELETE" | "POST", () => string, unknown?][] = [
+  const attempts: [string, "GET" | "PATCH" | "DELETE" | "POST" | "PUT", () => string, unknown?][] = [
     ["read a plan", "GET", () => `/api/v1/plans/${ids.planId}`],
     ["rename a plan", "PATCH", () => `/api/v1/plans/${ids.planId}`, { name: "Hijacked" }],
     ["activate a plan", "PATCH", () => `/api/v1/plans/${ids.planId}`, { isActive: true }],
@@ -107,7 +107,7 @@ describe("a user cannot reach another user's custom exercises", () => {
 });
 
 describe("a user who is not signed in", () => {
-  const routes: ["GET" | "POST" | "PATCH" | "DELETE", () => string][] = [
+  const routes: ["GET" | "POST" | "PUT" | "PATCH" | "DELETE", () => string][] = [
     ["GET", () => "/api/v1/exercises"],
     ["POST", () => "/api/v1/exercises"],
     ["PATCH", () => `/api/v1/exercises/${ids.customExerciseId}`],

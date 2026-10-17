@@ -9,6 +9,9 @@ import { PlanEditor } from "./pages/PlanEditor";
 import { Plans } from "./pages/Plans";
 import { Register } from "./pages/Register";
 import { Settings } from "./pages/Settings";
+import { Workout } from "./pages/Workout";
+import { WorkoutAddExercise } from "./pages/WorkoutAddExercise";
+import { WorkoutSummary } from "./pages/WorkoutSummary";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { state } = useAuth();
@@ -29,6 +32,9 @@ export function App() {
       <Route path="/plans" element={protectedRoute(<Plans />)} />
       <Route path="/plans/:planId" element={protectedRoute(<PlanEditor />)} />
       <Route path="/plans/:planId/add-exercise" element={protectedRoute(<AddExercise />)} />
+      <Route path="/workout" element={protectedRoute(<Workout />)} />
+      <Route path="/workout/add-exercise" element={protectedRoute(<WorkoutAddExercise />)} />
+      <Route path="/workout/summary/:clientId" element={protectedRoute(<WorkoutSummary />)} />
       <Route path="/settings" element={protectedRoute(<Settings />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
