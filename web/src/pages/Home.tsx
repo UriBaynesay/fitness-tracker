@@ -14,6 +14,7 @@ import { listWorkouts } from "../session/store";
 import { buildWeek, lastFinishedDayId, mergeSessions, type WeekSession } from "../session/week";
 import { useWorkout } from "../session/WorkoutContext";
 import type { WorkoutDoc } from "../session/types";
+import { useDocumentTitle } from "../lib/title";
 
 const PREVIEW_EXERCISES = 3;
 
@@ -21,6 +22,7 @@ const PREVIEW_EXERCISES = 3;
 // start, this week at a glance, and last time's numbers next to the plan's targets.
 export function Home() {
   const { t, i18n } = useTranslation();
+  useDocumentTitle(t("home.title"));
   const { state } = useAuth();
   const { active, ready, begin } = useWorkout();
   const navigate = useNavigate();

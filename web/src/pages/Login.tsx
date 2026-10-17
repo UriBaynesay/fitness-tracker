@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import { ApiError } from "../api";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageToggle } from "../components/LanguageToggle";
+import { useDocumentTitle } from "../lib/title";
 
 export function Login() {
   const { t } = useTranslation();
+  useDocumentTitle(t("auth.loginTitle"));
   const { state, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

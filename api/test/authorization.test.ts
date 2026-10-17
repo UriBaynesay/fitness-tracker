@@ -123,6 +123,7 @@ describe("a user who is not signed in", () => {
     ["PATCH", () => `/api/v1/plan-exercises/${ids.planExerciseId}`],
     ["DELETE", () => `/api/v1/plan-exercises/${ids.planExerciseId}`],
     ["PATCH", () => "/api/v1/me"],
+    ["DELETE", () => "/api/v1/me"],
     ["PUT", () => `/api/v1/sessions/${zeroId}`],
     ["DELETE", () => `/api/v1/sessions/${zeroId}`],
     ["GET", () => "/api/v1/sessions"],

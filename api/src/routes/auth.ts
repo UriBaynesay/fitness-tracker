@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { eq } from "drizzle-orm";
-import { loginBodySchema, registerBodySchema, updateMeBodySchema, type Profile } from "@fitness/shared";
+import { deleteAccountBodySchema, loginBodySchema, registerBodySchema, updateMeBodySchema, type Profile } from "@fitness/shared";
 import type { Config } from "../config.js";
 import type { Db } from "../db/index.js";
 import { profiles, type ProfileRow } from "../db/schema.js";
@@ -126,6 +126,20 @@ export function registerAuthRoutes(app: FastifyInstance, deps: AuthRouteDeps): v
   app.get("/api/v1/me", async (request, reply) => {
     const profile = await requireProfile(deps, request, reply);
     return { profile: toProfileDto(profile) };
+  });
+
+  // Permanently deletes the account and everything it owns. The foreign keys cascade
+  // (sessions, plans, workouts, goals, custom exercises), so one statement is enough.
+  // It checks a password, so it shares the login rate limit.
+  app.delete("/api/v1/me", { config: { rateLimit: rateLimits.login } }, async (request, reply) => {
+    const profile = await requireProfile(deps, request, reply);
+    const body = deleteAccountBodySchema.parse(request.body);
+    if (!profile.passwordHash || !(await verifyPassword(profile.passwordHash, body.password))) {
+      throw new HttpError(403, "invalid_credentials");
+    }
+    await db.delete(profiles).where(eq(profiles.id, profile.id));
+    reply.clearCookie(SESSION_COOKIE, { path: "/" });
+    return reply.code(204).send();
   });
 
   // Settings: language, weight unit, display name. Weights are stored in kg, so

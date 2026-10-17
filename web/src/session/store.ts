@@ -81,3 +81,11 @@ export async function readCache<T>(key: string): Promise<T | undefined> {
 export async function removeCache(key: string): Promise<void> {
   await database.cache.delete(key);
 }
+
+// Everything this device holds for one person: their workouts and cached reads.
+// Used when the account is deleted.
+export async function clearProfileData(profileId: string): Promise<void> {
+  await database.workouts.where({ profileId }).delete();
+  await database.cache.where("key").startsWith(`${profileId}:`).delete();
+  await database.cache.delete("lastProfile");
+}

@@ -223,6 +223,7 @@
     "freeWorkout": "אימון חופשי",
     "progress": "{{current}} / {{total}}",
     "overview": "תרגילים",
+    "overviewButton": "תרגילים, {{current}} / {{total}}",
     "target": "יעד {{sets}} × {{reps}}",
     "targetTimed": "יעד {{sets}} × {{seconds}} שנ׳",
     "restInfo": "מנוחה {{seconds}} שנ׳",
@@ -284,6 +285,17 @@
     "lb": "ליברות",
     "name": "שם",
     "account": "חשבון",
+    "deleteTitle": "מחיקת חשבון",
+    "deleteBody": "הפעולה מוחקת לצמיתות את החשבון, התוכניות, האימונים, היעדים והתרגילים שיצרת, מהשרת ומהמכשיר הזה. אי אפשר לבטל אותה.",
+    "deleteStart": "מחיקת החשבון שלי",
+    "deletePassword": "יש להזין סיסמה לאישור",
+    "deleteConfirm": "מחיקת הכול לצמיתות",
+    "deleteUnsynced": "{{count}} אימונים במכשיר הזה עדיין לא הגיעו לשרת. הם יאבדו.",
+    "deleteErrors": {
+      "invalid_credentials": "הסיסמה שגויה.",
+      "rate_limited": "יותר מדי ניסיונות. יש להמתין דקה ולנסות שוב.",
+      "network": "אין חיבור לשרת. מחיקה דורשת חיבור."
+    },
     "email": "אימייל"
   }
 }

@@ -2,7 +2,7 @@ import "fake-indexeddb/auto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api";
 import { completeSet, discard, finish, startEmpty } from "./logic";
-import { database, getActiveWorkout, getWorkout, listDirtyWorkouts, markSynced, readCache, saveWorkout, writeCache } from "./store";
+import { clearProfileData, database, getActiveWorkout, getWorkout, listDirtyWorkouts, markSynced, readCache, saveWorkout, writeCache } from "./store";
 import { retryDelayMs, syncPending } from "./sync";
 
 const put = vi.fn();
@@ -56,6 +56,24 @@ describe("local storage", () => {
     await writeCache("p1:today", { a: 1 });
     expect(await readCache("p1:today")).toEqual({ a: 1 });
     expect(await readCache("nope")).toBeUndefined();
+  });
+});
+
+describe("forgetting a person", () => {
+  it("removes that person's workouts and cached reads, and nobody else's", async () => {
+    const mine = workout("pd");
+    const theirs = workout("pe");
+    await saveWorkout(mine);
+    await saveWorkout(theirs);
+    await writeCache("pd:goals", [1]);
+    await writeCache("pe:goals", [2]);
+    await writeCache("lastProfile", { id: "pd" });
+    await clearProfileData("pd");
+    expect(await getWorkout(mine.clientId)).toBeUndefined();
+    expect(await readCache("pd:goals")).toBeUndefined();
+    expect(await readCache("lastProfile")).toBeUndefined();
+    expect(await getWorkout(theirs.clientId)).toBeDefined();
+    expect(await readCache("pe:goals")).toEqual([2]);
   });
 });
 

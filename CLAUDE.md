@@ -128,6 +128,14 @@ exercise FK), one goal per exercise + metric, start value captured from the pers
 creation, no deadline and no stored status (progress is derived on read, `shared/src/goals.ts`),
 `GET/POST/PATCH/DELETE /goals` (best computed server-side), Goals tab; changes need a
 connection, the list is cached on the device for offline reading.
+Milestone 7 (polish) is built on `feature/m7-polish`: `DELETE /api/v1/me` (password required,
+login rate limit, one cascading delete; the device's workouts and caches are cleared too),
+Settings "Delete account" flow, per-screen document titles, exit sheet focus trap / Escape /
+focus return, `h1` on the rest view, accessible name for the progress button. An axe-core audit
+(ad hoc, not a repo dependency) of 30 screen states in English and Hebrew now reports no
+violations. Not done by choice: global rate limiting, error tracking. Hebrew strings were
+checked for layout only; a native-speaker proofread is still the owner's.
+Remaining before launch: push the repo, the single owner-run deploy, production acceptance.
 The owner deploys once, after the whole app is finished (no per-milestone deploys).
 See `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { displayToKg, exerciseName, kgToDisplay, type Language, type WeightUnit } from "@fitness/shared";
@@ -8,6 +8,8 @@ import { ChevronDownIcon, ChevronUpIcon } from "../components/icons";
 import { Screen } from "../components/Screen";
 import { Stepper } from "../components/Stepper";
 import { setText } from "../lib/format";
+import { useDocumentTitle } from "../lib/title";
+import { useSheetFocus } from "../lib/useSheetFocus";
 import { hintShort } from "../lib/hints";
 import { primeAudio, useWakeLock } from "../session/alerts";
 import { newId } from "../session/ids";
@@ -61,6 +63,10 @@ export function Workout() {
   const [sheet, setSheet] = useState(false);
   const [edited, setEdited] = useState<Draft | null>(null);
 
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const closeSheet = useCallback(() => setSheet(false), []);
+  useSheetFocus(sheet, sheetRef, closeSheet);
+  useDocumentTitle(active?.planDayName ?? t("workout.freeWorkout"));
   useWakeLock(active !== null);
   // A rest is over the moment the workout changes shape under it.
   useEffect(() => setSheet(false), [active?.rev]);
@@ -98,7 +104,7 @@ export function Workout() {
       <button
         type="button"
         className="btn btn-ghost btn-small position"
-        aria-label={t("workout.overview")}
+        aria-label={t("workout.overviewButton", { current: progress, total })}
         aria-expanded={panel === "overview"}
         onClick={() => setPanel(panel === "overview" ? "work" : "overview")}
       >
@@ -109,7 +115,7 @@ export function Workout() {
 
   const exitSheet = sheet && (
     <div className="sheet-backdrop">
-      <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div className="sheet" ref={sheetRef} role="dialog" aria-modal="true" aria-labelledby="sheet-title">
         <h2 className="section-title" id="sheet-title">
           {t("workout.sheetTitle")}
         </h2>

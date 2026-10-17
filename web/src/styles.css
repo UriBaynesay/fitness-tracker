@@ -1139,3 +1139,7 @@ html[dir="rtl"] .rtl-flip {
   border-radius: 5px;
   background: var(--accent);
 }
+
+.rest-heading {
+  margin: 0;
+}

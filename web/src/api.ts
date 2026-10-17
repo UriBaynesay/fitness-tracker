@@ -55,6 +55,8 @@ type PlanResult = Promise<{ plan: Plan }>;
 
 export const api = {
   me: () => request<{ profile: Profile }>("GET", "/api/v1/me"),
+  // Permanently deletes the account; needs the password again.
+  deleteAccount: (password: string) => request<void>("DELETE", "/api/v1/me", { password }),
   updateMe: (body: UpdateMeInput) => request<{ profile: Profile }>("PATCH", "/api/v1/me", body),
   register: (body: RegisterInput) => request<{ profile: Profile }>("POST", "/api/v1/auth/register", body),
   login: (body: LoginBody) => request<{ profile: Profile }>("POST", "/api/v1/auth/login", body),

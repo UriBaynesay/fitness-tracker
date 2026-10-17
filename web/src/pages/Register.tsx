@@ -5,9 +5,11 @@ import { PASSWORD_MIN_LENGTH, type Language } from "@fitness/shared";
 import { ApiError } from "../api";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageToggle } from "../components/LanguageToggle";
+import { useDocumentTitle } from "../lib/title";
 
 export function Register() {
   const { t, i18n } = useTranslation();
+  useDocumentTitle(t("auth.registerTitle"));
   const { state, register } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
