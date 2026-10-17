@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Language, WeightUnit } from "@fitness/shared";
@@ -7,18 +7,43 @@ import { TextField } from "../components/fields";
 import { ChevronStartIcon } from "../components/icons";
 import { LanguageToggle } from "../components/LanguageToggle";
 import { Screen } from "../components/Screen";
+import { listDirtyWorkouts } from "../session/store";
+import { ApiError } from "../api";
 import { readDeviceSettings, writeDeviceSettings, type DeviceSettings } from "../session/device";
+import { useDocumentTitle } from "../lib/title";
 
 const UNITS: WeightUnit[] = ["kg", "lb"];
 
 export function Settings() {
   const { t } = useTranslation();
-  const { state, updateProfile, logout } = useAuth();
+  useDocumentTitle(t("settings.title"));
+  const { state, updateProfile, logout, deleteAccount } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [unsynced, setUnsynced] = useState(0);
   const [device, setDevice] = useState<DeviceSettings>(readDeviceSettings);
   if (state.status !== "authenticated") return null;
   const { profile } = state;
+
+  async function startDelete() {
+    setDeleteError(null);
+    setUnsynced((await listDirtyWorkouts(profile.id).catch(() => [])).length);
+    setDeleting(true);
+  }
+
+  async function confirmDelete(event: FormEvent) {
+    event.preventDefault();
+    setDeleteError(null);
+    try {
+      await deleteAccount(deletePassword);
+      navigate("/login", { replace: true });
+    } catch (caught) {
+      setDeleteError(caught instanceof ApiError ? caught.code : "generic");
+    }
+  }
 
   async function save(body: { language?: Language; weightUnit?: WeightUnit; displayName?: string }) {
     setError(false);
@@ -106,6 +131,56 @@ export function Settings() {
         >
           {t("auth.logout")}
         </button>
+      </section>
+
+      <section className="card form" aria-labelledby="delete-title">
+        <h2 className="section-title" id="delete-title">
+          {t("settings.deleteTitle")}
+        </h2>
+        <p className="muted">{t("settings.deleteBody")}</p>
+        {deleting ? (
+          <form className="form" onSubmit={confirmDelete}>
+            {unsynced > 0 && (
+              <p className="error" role="alert">
+                {t("settings.deleteUnsynced", { count: unsynced })}
+              </p>
+            )}
+            <label className="field">
+              <span className="label">{t("settings.deletePassword")}</span>
+              <input
+                className="input"
+                type="password"
+                autoComplete="current-password"
+                autoFocus
+                value={deletePassword}
+                onChange={(event) => setDeletePassword(event.target.value)}
+              />
+            </label>
+            {deleteError && (
+              <p className="error" role="alert">
+                {t(`settings.deleteErrors.${deleteError}`, { defaultValue: t("errors.generic") })}
+              </p>
+            )}
+            <button className="btn btn-danger" type="submit" disabled={deletePassword === ""}>
+              {t("settings.deleteConfirm")}
+            </button>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => {
+                setDeleting(false);
+                setDeletePassword("");
+                setDeleteError(null);
+              }}
+            >
+              {t("common.cancel")}
+            </button>
+          </form>
+        ) : (
+          <button type="button" className="btn btn-danger" onClick={() => void startDelete()}>
+            {t("settings.deleteStart")}
+          </button>
+        )}
       </section>
     </Screen>
   );

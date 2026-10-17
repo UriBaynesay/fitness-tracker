@@ -55,9 +55,9 @@ export function RestView({ rest, nextLabel, nextDetail, onAdjust, onEnd }: RestV
 
   return (
     <section className="rest" aria-labelledby="rest-title">
-      <p className="label" id="rest-title">
+      <h1 className="label rest-heading" id="rest-title">
         {expired ? t("workout.restOver") : t("workout.rest")}
-      </p>
+      </h1>
       <div className="rest-ring">
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <circle className="rest-ring-track" cx="100" cy="100" r={RADIUS} />

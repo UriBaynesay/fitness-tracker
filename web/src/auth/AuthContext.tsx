@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { LoginBody, Profile, RegisterInput, UpdateMeInput } from "@fitness/shared";
 import { ApiError, api } from "../api";
-import { readCache, removeCache, writeCache } from "../session/store";
+import { clearProfileData, readCache, removeCache, writeCache } from "../session/store";
 import { profileAfterFailure } from "./offline";
 import { setLanguage } from "../i18n";
 
@@ -15,6 +15,8 @@ interface AuthContextValue {
   login: (body: LoginBody) => Promise<void>;
   register: (body: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  // Deletes the account for good (password required), then forgets it on this device.
+  deleteAccount: (password: string) => Promise<void>;
   // Settings: saves, then adopts the profile the server returns (and its language).
   updateProfile: (body: UpdateMeInput) => Promise<void>;
 }
@@ -69,6 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout: async () => {
         await api.logout();
         void removeCache(LAST_PROFILE_KEY).catch(() => undefined);
+        setState({ status: "anonymous" });
+      },
+      deleteAccount: async (password) => {
+        if (state.status !== "authenticated") return;
+        await api.deleteAccount(password);
+        await clearProfileData(state.profile.id).catch(() => undefined);
         setState({ status: "anonymous" });
       },
       updateProfile: async (body) => authenticate((await api.updateMe(body)).profile),

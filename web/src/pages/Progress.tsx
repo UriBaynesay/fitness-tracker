@@ -7,6 +7,7 @@ import { Screen } from "../components/Screen";
 import { setText } from "../lib/format";
 import { loadLibrary, loadProgress, loadTrained } from "../session/data";
 import { buildSeries, metricsFor, type Metric } from "../session/progress";
+import { useDocumentTitle } from "../lib/title";
 
 const RECENT_SESSIONS = 10;
 
@@ -15,6 +16,7 @@ const COLORS = { accent: "#c8f135", grid: "#2c313b", text: "#9aa0ab", surface: "
 
 export function Progress() {
   const { t, i18n } = useTranslation();
+  useDocumentTitle(t("progress.title"));
   const { state } = useAuth();
   const language = i18n.language as Language;
   const profileId = state.status === "authenticated" ? state.profile.id : null;

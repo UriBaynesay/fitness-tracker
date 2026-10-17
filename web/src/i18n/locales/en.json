@@ -223,6 +223,7 @@
     "freeWorkout": "Free workout",
     "progress": "{{current}} / {{total}}",
     "overview": "Exercises",
+    "overviewButton": "Exercises, {{current}} / {{total}}",
     "target": "Target {{sets}} × {{reps}}",
     "targetTimed": "Target {{sets}} × {{seconds}} s",
     "restInfo": "rest {{seconds}} s",
@@ -284,6 +285,17 @@
     "lb": "lb",
     "name": "Name",
     "account": "Account",
+    "deleteTitle": "Delete account",
+    "deleteBody": "This permanently removes your account, plans, workouts, goals and custom exercises from the server and from this device. It cannot be undone.",
+    "deleteStart": "Delete my account",
+    "deletePassword": "Enter your password to confirm",
+    "deleteConfirm": "Delete everything permanently",
+    "deleteUnsynced": "{{count}} workout(s) on this device haven't reached the server yet. They will be lost.",
+    "deleteErrors": {
+      "invalid_credentials": "That password is wrong.",
+      "rate_limited": "Too many attempts. Wait a minute and try again.",
+      "network": "Can't reach the server. Deleting needs a connection."
+    },
     "email": "Email"
   }
 }

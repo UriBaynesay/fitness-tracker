@@ -50,6 +50,10 @@ export const updateMeBodySchema = z
   .refine((body) => Object.keys(body).length > 0, { message: "at least one field is required" });
 export type UpdateMeInput = z.infer<typeof updateMeBodySchema>;
 
+// Deleting an account asks for the password again, so a stolen session alone cannot do it.
+export const deleteAccountBodySchema = z.object({ password: z.string().min(1).max(PASSWORD_MAX_LENGTH) });
+export type DeleteAccountInput = z.infer<typeof deleteAccountBodySchema>;
+
 export const profileResponseSchema = z.object({ profile: profileSchema });
 export type ProfileResponse = z.infer<typeof profileResponseSchema>;
 

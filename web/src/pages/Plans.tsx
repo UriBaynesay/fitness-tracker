@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import type { PlanSummary } from "@fitness/shared";
 import { ApiError, api } from "../api";
 import { Screen } from "../components/Screen";
+import { useDocumentTitle } from "../lib/title";
 
 export function Plans() {
   const { t } = useTranslation();
+  useDocumentTitle(t("plans.title"));
   const navigate = useNavigate();
   const [plans, setPlans] = useState<PlanSummary[] | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);

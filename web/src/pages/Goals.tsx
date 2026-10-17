@@ -18,9 +18,11 @@ import { Screen } from "../components/Screen";
 import { toDisplayValue, toStoredValue, valueText } from "../lib/goals";
 import { muscleGroupKey } from "../lib/labels";
 import { loadGoals, loadLibrary, rememberGoals } from "../session/data";
+import { useDocumentTitle } from "../lib/title";
 
 export function Goals() {
   const { t, i18n } = useTranslation();
+  useDocumentTitle(t("goals.title"));
   const { state } = useAuth();
   const language = i18n.language as Language;
   const profileId = state.status === "authenticated" ? state.profile.id : null;
