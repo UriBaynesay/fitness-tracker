@@ -1,8 +1,10 @@
 import type {
   CreateExerciseInput,
+  CreateGoalInput,
   ErrorResponse,
   Exercise,
   ExerciseHistory,
+  Goal,
   LoginBody,
   Plan,
   PlanSummary,
@@ -11,6 +13,7 @@ import type {
   SessionSummary,
   SyncSession,
   UpdateDayInput,
+  UpdateGoalInput,
   UpdateMeInput,
   UpdatePlanExerciseInput,
   UpdatePlanInput,
@@ -66,6 +69,13 @@ export const api = {
     // One exercise's workouts for the Progress screen, and which exercises have any.
     historyOf: (id: string, limit = 100) => request<{ history: ExerciseHistory }>("GET", `/api/v1/exercises/${id}/history?limit=${limit}`),
     trained: () => request<{ exerciseIds: string[] }>("GET", "/api/v1/exercises/trained"),
+  },
+
+  goals: {
+    list: () => request<{ goals: Goal[] }>("GET", "/api/v1/goals"),
+    create: (body: CreateGoalInput) => request<{ goal: Goal }>("POST", "/api/v1/goals", body),
+    update: (id: string, body: UpdateGoalInput) => request<{ goal: Goal }>("PATCH", `/api/v1/goals/${id}`, body),
+    remove: (id: string) => request<void>("DELETE", `/api/v1/goals/${id}`),
   },
 
   sessions: {

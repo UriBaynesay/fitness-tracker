@@ -1090,3 +1090,52 @@ html[dir="rtl"] .rtl-flip {
   inline-size: 100%;
   min-inline-size: 0;
 }
+
+/* ---- milestone 6: goals ---------------------------------------------------- */
+
+.goal-head,
+.goal-numbers,
+.goal-foot,
+.goal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-numbers > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.goal-value {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.goal-actions > * {
+  flex: 1;
+}
+
+.goal-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+/* Fills from the start edge, so it grows rightward in English and leftward in Hebrew. */
+.bar {
+  block-size: 10px;
+  border-radius: 5px;
+  background: var(--surface-raised);
+  overflow: hidden;
+}
+
+.bar-fill {
+  block-size: 100%;
+  border-radius: 5px;
+  background: var(--accent);
+}

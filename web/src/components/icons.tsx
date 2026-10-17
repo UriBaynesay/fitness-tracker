@@ -35,6 +35,13 @@ export const ChartIcon = () => (
     <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
   </Icon>
 );
+export const TargetIcon = () => (
+  <Icon>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="4.5" />
+    <path d="M12 12h.01" />
+  </Icon>
+);
 export const UserIcon = () => (
   <Icon>
     <circle cx="12" cy="8" r="4" />

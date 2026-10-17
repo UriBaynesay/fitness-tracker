@@ -12,6 +12,7 @@ import { registerErrorHandler } from "./http/errors.js";
 import { registerOriginGuard } from "./http/origin-guard.js";
 import { registerAuthRoutes, type RateLimitOptions } from "./routes/auth.js";
 import { registerExerciseRoutes } from "./routes/exercises.js";
+import { registerGoalRoutes } from "./routes/goals.js";
 import { registerPlanRoutes } from "./routes/plans.js";
 import { registerSessionRoutes } from "./routes/sessions.js";
 
@@ -88,6 +89,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   registerExerciseRoutes(app, { db, config });
   registerPlanRoutes(app, { db, config });
   registerSessionRoutes(app, { db, config });
+  registerGoalRoutes(app, { db, config });
 
   const webDist = options.webDist === undefined ? DEFAULT_WEB_DIST : options.webDist;
   if (webDist && existsSync(webDist)) {

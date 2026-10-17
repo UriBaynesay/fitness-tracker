@@ -123,6 +123,11 @@ prefill the steppers (after a set the weight follows what was actually lifted). 
 screen (`/progress`, lazy-loaded Recharts chart, Weight / Reps / Est. 1RM / Duration, recent
 workouts) reads `GET /exercises/:id/history` and `GET /exercises/trained`; hint numbers
 are isolated left-to-right inside Hebrew sentences.
+Milestone 6 (goals) is built on `feature/m6-goals`: `goals` table (migration 0003, deferrable
+exercise FK), one goal per exercise + metric, start value captured from the person's best at
+creation, no deadline and no stored status (progress is derived on read, `shared/src/goals.ts`),
+`GET/POST/PATCH/DELETE /goals` (best computed server-side), Goals tab; changes need a
+connection, the list is cached on the device for offline reading.
 The owner deploys once, after the whole app is finished (no per-milestone deploys).
 See `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach

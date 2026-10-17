@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "./auth/AuthContext";
 import { AddExercise } from "./pages/AddExercise";
+import { Goals } from "./pages/Goals";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { PlanEditor } from "./pages/PlanEditor";
@@ -52,6 +53,7 @@ export function App() {
           </Suspense>
         )}
       />
+      <Route path="/goals" element={protectedRoute(<Goals />)} />
       <Route path="/settings" element={protectedRoute(<Settings />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
