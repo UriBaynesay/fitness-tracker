@@ -141,7 +141,7 @@ function completeSetIntoExercise(doc: ReturnType<typeof workout>) {
     ...doc,
     exercises: [
       {
-        clientId: newId(), exerciseId: newId(), nameEn: "X", nameHe: null, isTimed: false, skipped: false, previous: [], sets: [],
+        clientId: newId(), exerciseId: newId(), nameEn: "X", nameHe: null, isTimed: false, skipped: false, previous: [], recent: [], hint: null, sets: [],
         targetSets: 3, targetReps: 10, targetDurationSeconds: null, restSeconds: 90, progressionMode: "target" as const,
         failureTargetReps: null, sessionsToConfirm: 2, weightStepKg: 2.5,
       },

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { planExerciseConfigFor, syncSessionSchema, type SyncExercise } from "@fitness/shared";
 import { exercises, planDays, plans, sessionExercises, setLogs, workoutSessions } from "../db/schema.js";
 import { HttpError } from "../http/errors.js";
-import { exerciseHistory, listFinishedSessions, toSessionSummary } from "../sessions/queries.js";
+import { exerciseHistory, listFinishedSessions, toSessionSummary, trainedExerciseIds } from "../sessions/queries.js";
 import { requireProfile, type RouteDeps } from "./auth.js";
 
 // A whole workout is at most 30 exercises x 40 sets, comfortably under this.
@@ -17,6 +17,8 @@ const listQuery = z.object({
   to: z.iso.datetime({ offset: true }).optional(),
   limit: z.coerce.number().int().min(1).max(500).default(200),
 });
+
+const oneExerciseQuery = z.object({ limit: z.coerce.number().int().min(1).max(200).default(50) });
 
 const historyQuery = z.object({
   ids: z
@@ -170,5 +172,28 @@ export function registerSessionRoutes(app: FastifyInstance, deps: RouteDeps): vo
     const profile = await requireProfile(deps, request, reply);
     const query = historyQuery.parse(request.query);
     return { history: await exerciseHistory(db, profile.id, query.ids, query.limit) };
+  });
+
+  // Ids of exercises with finished sets, for the Progress picker. Registered as a
+  // static path, so it never collides with a parameterised /exercises/:id route.
+  app.get("/api/v1/exercises/trained", async (request, reply) => {
+    const profile = await requireProfile(deps, request, reply);
+    return { exerciseIds: await trainedExerciseIds(db, profile.id) };
+  });
+
+  // One exercise's recent finished workouts, newest first (the Progress chart).
+  app.get("/api/v1/exercises/:id/history", async (request, reply) => {
+    const profile = await requireProfile(deps, request, reply);
+    const { id } = z.object({ id: z.uuid() }).parse(request.params);
+    const { limit } = oneExerciseQuery.parse(request.query);
+    // Someone else's custom exercise looks exactly like one that doesn't exist.
+    const [visible] = await db
+      .select({ id: exercises.id })
+      .from(exercises)
+      .where(and(eq(exercises.id, id), or(isNull(exercises.ownerId), eq(exercises.ownerId, profile.id))))
+      .limit(1);
+    if (!visible) throw new HttpError(404, "not_found");
+    const [history] = await exerciseHistory(db, profile.id, [id], limit);
+    return { history: history ?? { exerciseId: id, sessions: [] } };
   });
 }

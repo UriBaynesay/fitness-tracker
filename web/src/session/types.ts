@@ -1,4 +1,4 @@
-import type { HistorySet, PlanExerciseConfig } from "@fitness/shared";
+import type { Hint, HistorySet, PlanExerciseConfig } from "@fitness/shared";
 
 // A workout lives on the phone first (IndexedDB) and is pushed to the server as one
 // document. Everything needed to keep going without a network is inside it: the
@@ -25,8 +25,12 @@ export interface WorkoutExercise extends PlanExerciseConfig, ExerciseInfo {
   clientId: string;
   skipped: boolean;
   sets: LoggedSet[];
-  // The sets done in the last finished workout, to prefill and to show "last time".
+  // The sets done in the last finished workout, to show "last time".
   previous: HistorySet[];
+  // The last few workouts' sets (newest first) and what the overload rule made of them
+  // when this workout started. Fixed at that moment: it must not shift mid-workout.
+  recent: HistorySet[][];
+  hint: Hint | null;
 }
 
 // Rest is stored as an end time, not a counter, so it survives a locked screen,

@@ -1062,3 +1062,31 @@ html[dir="rtl"] .rtl-flip {
   font-weight: 700;
   overflow-wrap: anywhere;
 }
+
+/* ---- milestone 5: hints and progress ------------------------------------- */
+
+.hint-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.hint-card strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.hint-line {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chart {
+  inline-size: 100%;
+  min-inline-size: 0;
+}

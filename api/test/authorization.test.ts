@@ -127,6 +127,8 @@ describe("a user who is not signed in", () => {
     ["DELETE", () => `/api/v1/sessions/${zeroId}`],
     ["GET", () => "/api/v1/sessions"],
     ["GET", () => `/api/v1/exercises/history?ids=${zeroId}`],
+    ["GET", () => "/api/v1/exercises/trained"],
+    ["GET", () => `/api/v1/exercises/${zeroId}/history`],
   ];
 
   it.each(routes)("gets 401 from %s %s", async (method, url) => {
@@ -182,6 +184,15 @@ describe("workouts belong to their owner", () => {
 
     expect((await call(t.app, "DELETE", `/api/v1/sessions/${sameId}`, bob)).statusCode).toBe(204);
     expect((await call(t.app, "GET", "/api/v1/sessions", alice)).json().sessions).toHaveLength(1);
+  });
+
+  it("another user's trained exercises and per-exercise history are invisible", async () => {
+    const lib = await libraryExercise(t.app, alice, false);
+    await call(t.app, "PUT", `/api/v1/sessions/${sameId}`, alice, workout(lib.id, sameId));
+    expect((await call(t.app, "GET", "/api/v1/exercises/trained", alice)).json().exerciseIds).toEqual([lib.id]);
+    expect((await call(t.app, "GET", "/api/v1/exercises/trained", bob)).json().exerciseIds).toEqual([]);
+    expect((await call(t.app, "GET", `/api/v1/exercises/${lib.id}/history`, bob)).json().history.sessions).toEqual([]);
+    expect((await call(t.app, "GET", `/api/v1/exercises/${ids.customExerciseId}/history`, bob)).statusCode).toBe(404);
   });
 
   it("another user's custom exercise is not usable in a workout and has no history", async () => {

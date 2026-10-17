@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 import type { ExerciseHistory, HistorySet, SessionSummary } from "@fitness/shared";
 import type { Db } from "../db/index.js";
 import { exercises, sessionExercises, setLogs, workoutSessions, type WorkoutSessionRow } from "../db/schema.js";
@@ -101,4 +101,18 @@ export async function exerciseHistory(
     exerciseId,
     sessions: (byExercise.get(exerciseId) ?? []).map(({ startedAt, sets }) => ({ startedAt, sets })),
   }));
+}
+
+// Exercises the person has actually done (finished workout, not skipped, at least one
+// set), most recently trained first. Feeds the Progress screen's picker.
+export async function trainedExerciseIds(db: Db, profileId: string): Promise<string[]> {
+  const rows = await db
+    .select({ exerciseId: sessionExercises.exerciseId, last: sql<string>`max(${workoutSessions.startedAt})` })
+    .from(setLogs)
+    .innerJoin(sessionExercises, eq(sessionExercises.id, setLogs.sessionExerciseId))
+    .innerJoin(workoutSessions, eq(workoutSessions.id, sessionExercises.sessionId))
+    .where(and(eq(workoutSessions.profileId, profileId), isNotNull(workoutSessions.endedAt), eq(sessionExercises.skipped, false)))
+    .groupBy(sessionExercises.exerciseId)
+    .orderBy(desc(sql`max(${workoutSessions.startedAt})`));
+  return rows.map((row) => row.exerciseId);
 }

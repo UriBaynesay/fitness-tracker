@@ -63,6 +63,9 @@ export const api = {
     // Ids are sent in chunks by the caller; the server accepts up to 30 at once.
     history: (ids: string[], limit = 1) =>
       request<{ history: ExerciseHistory[] }>("GET", `/api/v1/exercises/history?ids=${ids.join(",")}&limit=${limit}`),
+    // One exercise's workouts for the Progress screen, and which exercises have any.
+    historyOf: (id: string, limit = 100) => request<{ history: ExerciseHistory }>("GET", `/api/v1/exercises/${id}/history?limit=${limit}`),
+    trained: () => request<{ exerciseIds: string[] }>("GET", "/api/v1/exercises/trained"),
   },
 
   sessions: {

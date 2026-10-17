@@ -1,4 +1,4 @@
-import type { Exercise, HistorySet, Plan, SessionSummary } from "@fitness/shared";
+import type { Exercise, ExerciseHistory, HistorySet, Plan, SessionSummary } from "@fitness/shared";
 import { api } from "../api";
 import { readCache, writeCache } from "./store";
 
@@ -43,15 +43,18 @@ export async function loadToday(profileId: string): Promise<TodayData> {
 
 const HISTORY_CHUNK = 30;
 
-// The sets from each exercise's last finished workout, keyed by exercise id.
-export async function loadHistory(profileId: string, exerciseIds: string[]): Promise<Map<string, HistorySet[]>> {
-  const key = `${profileId}:history`;
-  const stored = (await readCache<Record<string, HistorySet[]>>(key)) ?? {};
+const HISTORY_SESSIONS = 3;
+
+// The sets from each exercise's last few finished workouts (newest first), keyed by
+// exercise id: "last time" and the overload hint both read this.
+export async function loadHistory(profileId: string, exerciseIds: string[]): Promise<Map<string, HistorySet[][]>> {
+  const key = `${profileId}:history3`;
+  const stored = (await readCache<Record<string, HistorySet[][]>>(key)) ?? {};
   const ids = [...new Set(exerciseIds)];
   try {
     for (let i = 0; i < ids.length; i += HISTORY_CHUNK) {
-      const { history } = await api.exercises.history(ids.slice(i, i + HISTORY_CHUNK), 1);
-      for (const entry of history) stored[entry.exerciseId] = entry.sessions[0]?.sets ?? [];
+      const { history } = await api.exercises.history(ids.slice(i, i + HISTORY_CHUNK), HISTORY_SESSIONS);
+      for (const entry of history) stored[entry.exerciseId] = entry.sessions.map((session) => session.sets);
     }
     void writeCache(key, stored);
   } catch {
@@ -59,3 +62,22 @@ export async function loadHistory(profileId: string, exerciseIds: string[]): Pro
   }
   return new Map(ids.map((id) => [id, stored[id] ?? []]));
 }
+
+// Progress screen: which exercises have history, and one exercise's workouts.
+async function withCache<T>(key: string, load: () => Promise<T>): Promise<T> {
+  try {
+    const value = await load();
+    void writeCache(key, value);
+    return value;
+  } catch (error) {
+    const cached = await readCache<T>(key);
+    if (cached !== undefined) return cached;
+    throw error;
+  }
+}
+
+export const loadTrained = (profileId: string) =>
+  withCache(`${profileId}:trained`, async () => (await api.exercises.trained()).exerciseIds);
+
+export const loadProgress = (profileId: string, exerciseId: string) =>
+  withCache<ExerciseHistory["sessions"]>(`${profileId}:progress:${exerciseId}`, async () => (await api.exercises.historyOf(exerciseId)).history.sessions);

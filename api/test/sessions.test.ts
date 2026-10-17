@@ -234,6 +234,51 @@ describe("exercise history", () => {
   });
 });
 
+describe("one exercise's history", () => {
+  const one = async (id: string, query = "", as = token) => call(t.app, "GET", `/api/v1/exercises/${id}/history${query}`, as);
+
+  it("lists finished workouts newest first, with limit", async () => {
+    for (const d of [4, 3, 2]) {
+      await put(token, doc([entry(bench, 0, 1, { sets: [{ ...entry(bench, 0, 1).sets[0], weightKg: 50 + d }] })], { startedAt: minutesAgo(60 * 24 * d), endedAt: minutesAgo(60 * 24 * d - 30) }));
+    }
+    await put(token, doc([entry(bench, 0, 2)], { endedAt: null }));
+    const res = await one(bench.id);
+    expect(res.statusCode).toBe(200);
+    expect(res.json().history.exerciseId).toBe(bench.id);
+    expect(res.json().history.sessions.map((s: { sets: { weightKg: number }[] }) => s.sets[0]!.weightKg)).toEqual([52, 53, 54]);
+    expect((await one(bench.id, "?limit=2")).json().history.sessions).toHaveLength(2);
+  });
+
+  it("is empty for an exercise with no history", async () => {
+    expect((await one(plank.id)).json().history.sessions).toEqual([]);
+  });
+
+  it("validates the id and the limit", async () => {
+    expect((await one("nope")).statusCode).toBe(400);
+    expect((await one(bench.id, "?limit=201")).statusCode).toBe(400);
+    expect((await one(randomUUID())).statusCode).toBe(404);
+  });
+});
+
+describe("trained exercises", () => {
+  const trained = async (as = token) => (await call(t.app, "GET", "/api/v1/exercises/trained", as)).json().exerciseIds;
+
+  it("lists each exercise once, most recently trained first, ignoring skipped and unfinished", async () => {
+    await put(token, doc([entry(bench, 0, 2), entry(plank, 1, 2)], { startedAt: minutesAgo(60 * 24 * 3), endedAt: minutesAgo(60 * 24 * 3 - 30) }));
+    await put(token, doc([entry(plank, 0, 2)], { startedAt: minutesAgo(60 * 24), endedAt: minutesAgo(60 * 24 - 30) }));
+    expect(await trained()).toEqual([plank.id, bench.id]);
+
+    const third = await libraryExercise(t.app, token, false).then(async () => (await call(t.app, "GET", "/api/v1/exercises", token)).json().exercises.find((e: Exercise) => !e.isTimed && e.id !== bench.id));
+    await put(token, doc([entry(third, 0, 2, { skipped: true })]));
+    await put(token, doc([entry(third, 0, 2)], { endedAt: null }));
+    expect(await trained()).toEqual([plank.id, bench.id]);
+  });
+
+  it("is empty for someone who has not trained", async () => {
+    expect(await trained(await signup(t.app, "new@example.com"))).toEqual([]);
+  });
+});
+
 describe("deleting a profile", () => {
   it("removes its workouts and custom exercises even when a workout uses one", async () => {
     const custom = (await call(t.app, "POST", "/api/v1/exercises", token, { name: "Sled", muscleGroup: "quads", equipment: "other" })).json().exercise;

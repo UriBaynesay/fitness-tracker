@@ -1,8 +1,8 @@
 import { NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
-import { HomeIcon, ListIcon } from "./icons";
+import { ChartIcon, HomeIcon, ListIcon } from "./icons";
 
-// Only tabs for screens that exist: Progress and Goals join when those screens do.
+// Only tabs for screens that exist: Goals joins when that screen does.
 export function BottomNav() {
   const { t } = useTranslation();
   return (
@@ -14,6 +14,10 @@ export function BottomNav() {
       <NavLink to="/plans" className="bottom-nav-item">
         <ListIcon />
         {t("nav.plans")}
+      </NavLink>
+      <NavLink to="/progress" className="bottom-nav-item">
+        <ChartIcon />
+        {t("nav.progress")}
       </NavLink>
     </nav>
   );

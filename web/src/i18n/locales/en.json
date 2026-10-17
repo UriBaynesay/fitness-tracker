@@ -2,7 +2,7 @@
   "app": { "name": "Fitness Tracker" },
   "loading": "Loading…",
   "language": { "label": "Language", "en": "English", "he": "עברית" },
-  "nav": { "main": "Main navigation", "today": "Today", "plans": "Plans" },
+  "nav": { "main": "Main navigation", "today": "Today", "plans": "Plans", "progress": "Progress" },
   "common": {
     "cancel": "Cancel",
     "back": "Back",
@@ -164,6 +164,27 @@
     "timed": "Timed (hold for seconds instead of reps)",
     "create": "Create and select",
     "selected": "Selected"
+  },
+  "hint": {
+    "title": "Suggestion",
+    "try": "Try",
+    "reason": {
+      "addWeight": "You hit every target last time. Add weight.",
+      "moreReps": "Same weight, one more rep on set {{set}}, your weakest.",
+      "beatFailure": "Beat last time's reps on the last set.",
+      "deload": "Well short of the target twice in a row. Ease off the weight."
+    }
+  },
+  "progress": {
+    "title": "Progress",
+    "exercise": "Exercise",
+    "metric": "Measure",
+    "metrics": { "weight": "Weight", "reps": "Reps", "oneRm": "Est. 1RM", "duration": "Duration" },
+    "chartTitle": "Best {{metric}} per workout {{unit}}",
+    "chartLabel": "Line chart of {{count}} workouts",
+    "noData": "Nothing to chart for this measure yet.",
+    "empty": "No finished workouts yet. Log one and your progress will show up here.",
+    "recent": "Recent workouts"
   },
   "workout": {
     "exit": "Exit",

@@ -8,6 +8,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "../components/icons";
 import { Screen } from "../components/Screen";
 import { Stepper } from "../components/Stepper";
 import { setText } from "../lib/format";
+import { hintShort } from "../lib/hints";
 import { primeAudio, useWakeLock } from "../session/alerts";
 import { newId } from "../session/ids";
 import {
@@ -101,7 +102,7 @@ export function Workout() {
         aria-expanded={panel === "overview"}
         onClick={() => setPanel(panel === "overview" ? "work" : "overview")}
       >
-        {t("workout.progress", { current: progress, total })}
+        <span dir="ltr">{t("workout.progress", { current: progress, total })}</span>
       </button>
     </header>
   );
@@ -273,13 +274,21 @@ export function Workout() {
         </p>
         {exercise.previous.length > 0 && (
           <p className="muted-small">
+            {/* U+2066..U+2069 isolate the numbers as left-to-right inside a Hebrew sentence */}
             {t("workout.lastTime", {
-              sets: exercise.previous.map((set) => setText(set, unit)).join(" · "),
+              sets: `⁦${exercise.previous.map((set) => setText(set, unit)).join(" · ")}${exercise.isTimed ? "" : ` ${unit}`}⁩`,
             })}
-            {exercise.isTimed ? "" : ` ${unit}`}
           </p>
         )}
       </section>
+
+      {exercise.hint && (
+        <aside className="hint-card" aria-label={t("hint.title")}>
+          <span className="label">{t("hint.title")}</span>
+          <strong dir="ltr">{hintShort(exercise.hint, unit)}</strong>
+          <span className="muted-small">{t(`hint.reason.${exercise.hint.kind}`, { set: exercise.hint.setNumber ?? 0 })}</span>
+        </aside>
+      )}
 
       <ol className="set-rows" aria-label={t("workout.sets")}>
         {Array.from({ length: rows }, (_, index) => {
