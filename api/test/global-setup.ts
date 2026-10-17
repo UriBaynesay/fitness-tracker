@@ -1,5 +1,7 @@
 import pg from "pg";
+import { createDb } from "../src/db/index.js";
 import { runMigrations } from "../src/db/migrator.js";
+import { seedExercises } from "../src/db/seed.js";
 import { TEST_DATABASE_URL } from "./helpers.js";
 
 // Runs once before the suite: make sure the fitness_test database exists, then
@@ -23,4 +25,12 @@ export default async function setup(): Promise<void> {
   await client.end();
 
   await runMigrations(TEST_DATABASE_URL);
+
+  // The library is shared, read-only reference data: seed it once for the whole run.
+  const { db, pool } = createDb(TEST_DATABASE_URL);
+  try {
+    await seedExercises(db);
+  } finally {
+    await pool.end();
+  }
 }

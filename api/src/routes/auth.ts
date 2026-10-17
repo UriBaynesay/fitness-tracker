@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { eq } from "drizzle-orm";
-import { loginBodySchema, registerBodySchema, type Profile } from "@fitness/shared";
+import { loginBodySchema, registerBodySchema, updateMeBodySchema, type Profile } from "@fitness/shared";
 import type { Config } from "../config.js";
 import type { Db } from "../db/index.js";
 import { profiles, type ProfileRow } from "../db/schema.js";
@@ -24,6 +24,9 @@ export interface AuthRouteDeps {
   config: Config;
   rateLimits: { login: RateLimitOptions; register: RateLimitOptions };
 }
+
+// What the non-auth routes need: the database and config, to resolve the caller.
+export type RouteDeps = Pick<AuthRouteDeps, "db" | "config">;
 
 export function toProfileDto(row: ProfileRow): Profile {
   return {
@@ -123,5 +126,22 @@ export function registerAuthRoutes(app: FastifyInstance, deps: AuthRouteDeps): v
   app.get("/api/v1/me", async (request, reply) => {
     const profile = await requireProfile(deps, request, reply);
     return { profile: toProfileDto(profile) };
+  });
+
+  // Settings: language, weight unit, display name. Weights are stored in kg, so
+  // changing the unit only changes how they are shown.
+  app.patch("/api/v1/me", async (request, reply) => {
+    const profile = await requireProfile(deps, request, reply);
+    const body = updateMeBodySchema.parse(request.body);
+    const [row] = await db
+      .update(profiles)
+      .set({
+        ...(body.displayName !== undefined ? { displayName: body.displayName } : {}),
+        ...(body.language !== undefined ? { language: body.language } : {}),
+        ...(body.weightUnit !== undefined ? { weightUnit: body.weightUnit } : {}),
+      })
+      .where(eq(profiles.id, profile.id))
+      .returning();
+    return { profile: toProfileDto(row!) };
   });
 }

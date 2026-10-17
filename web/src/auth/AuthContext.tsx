@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { LoginBody, Profile, RegisterInput } from "@fitness/shared";
+import type { LoginBody, Profile, RegisterInput, UpdateMeInput } from "@fitness/shared";
 import { api } from "../api";
 import { setLanguage } from "../i18n";
 
@@ -13,6 +13,8 @@ interface AuthContextValue {
   login: (body: LoginBody) => Promise<void>;
   register: (body: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  // Settings: saves, then adopts the profile the server returns (and its language).
+  updateProfile: (body: UpdateMeInput) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await api.logout();
         setState({ status: "anonymous" });
       },
+      updateProfile: async (body) => authenticate((await api.updateMe(body)).profile),
     }),
     [state, authenticate]
   );

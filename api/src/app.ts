@@ -11,6 +11,8 @@ import type { Db } from "./db/index.js";
 import { registerErrorHandler } from "./http/errors.js";
 import { registerOriginGuard } from "./http/origin-guard.js";
 import { registerAuthRoutes, type RateLimitOptions } from "./routes/auth.js";
+import { registerExerciseRoutes } from "./routes/exercises.js";
+import { registerPlanRoutes } from "./routes/plans.js";
 
 export const DEFAULT_RATE_LIMITS: { login: RateLimitOptions; register: RateLimitOptions } = {
   login: { max: 10, timeWindow: "1 minute" },
@@ -82,6 +84,8 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   });
 
   registerAuthRoutes(app, { db, config, rateLimits: options.rateLimits ?? DEFAULT_RATE_LIMITS });
+  registerExerciseRoutes(app, { db, config });
+  registerPlanRoutes(app, { db, config });
 
   const webDist = options.webDist === undefined ? DEFAULT_WEB_DIST : options.webDist;
   if (webDist && existsSync(webDist)) {

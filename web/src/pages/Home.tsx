@@ -1,21 +1,27 @@
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Trans, useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
+import { UserIcon } from "../components/icons";
+import { Screen } from "../components/Screen";
 
-// Milestone 1 placeholder: proves the protected route end to end. The real
-// Today screen (current plan, week strip, targets) arrives with plans.
+// Placeholder until workout sessions exist: the real Today screen (current plan,
+// week strip, targets) arrives with them.
 export function Home() {
   const { t } = useTranslation();
-  const { state, logout } = useAuth();
-  const navigate = useNavigate();
+  const { state } = useAuth();
   if (state.status !== "authenticated") return null;
   const { profile } = state;
 
   // <bdi> isolates user-supplied text (a name, an email) from the surrounding
   // sentence's direction, so a left-to-right email inside Hebrew doesn't scramble.
   return (
-    <main className="screen">
-      <h1 className="title">{t("home.title")}</h1>
+    <Screen nav>
+      <header className="screen-header">
+        <h1 className="title">{t("home.title")}</h1>
+        <Link to="/settings" className="icon-button" aria-label={t("settings.open")}>
+          <UserIcon />
+        </Link>
+      </header>
       <section className="card">
         <p className="welcome">
           {profile.displayName ? (
@@ -29,16 +35,6 @@ export function Home() {
         </p>
         <p>{t("home.placeholder")}</p>
       </section>
-      <button
-        className="btn btn-ghost"
-        type="button"
-        onClick={async () => {
-          await logout();
-          navigate("/login", { replace: true });
-        }}
-      >
-        {t("auth.logout")}
-      </button>
-    </main>
+    </Screen>
   );
 }
