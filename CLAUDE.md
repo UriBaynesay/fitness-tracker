@@ -42,6 +42,17 @@ cookie. Open sign-up, rate-limited auth routes.
   is `auth_sessions` to avoid clashing with the spec's `workout_sessions`.)
 - **Only identity tables in milestone 1.** Plans, exercises, workout sessions and
   goals arrive with the milestone that first reads them.
+- **Timed exercises store seconds.** `plan_exercises.target_duration_seconds`
+  (spec has only `target_reps`): a timed exercise has seconds and no reps, weight
+  step or failure mode; a rep exercise has reps and no seconds. One shared Zod
+  refinement (`planExerciseConfigFor` in `shared/`) enforces it, since a CHECK can't
+  see `exercises.is_timed`.
+- **Plans autosave through small endpoints** (`/plan-days/:id`, `/plan-exercises/:id`,
+  each answering with the whole plan) instead of the spec's one nested payload; the
+  mockups have no Save button.
+- **A custom exercise has one name**, written to both language columns.
+- **Minimal Settings in milestone 2** (language, weight unit, name; the spec has the
+  screen in milestone 7, account deletion still waits for it).
 - **No nightly database backup.** The handoff lists one in milestone 1; the owner
   does not want database backups for any app. Do not add or propose them.
 
@@ -53,7 +64,9 @@ re-argued like any other decision in this project.
 - `api` publishes **`127.0.0.1:3001`** only; nginx is the sole public listener.
 - Migrations run **inside the production image**:
   `docker compose -f docker-compose.yml run --rm api node api/dist/db/migrate.js`.
-  `deploy.sh` does not run them; it is a deliberate manual step.
+  It also seeds the exercise library (idempotent upsert by slug from
+  `api/seed/exercises.json`, a copy of the handoff list), so it is safe on every
+  deploy. `deploy.sh` does not run it; it is a deliberate manual step.
 - Production `.env` is created by hand on the server, never committed. Generate
   secrets with `openssl rand -hex` (URL-safe: a `/` in a database password breaks
   connection-string parsing).
@@ -79,8 +92,17 @@ re-argued like any other decision in this project.
   screenshots and look at them. This caught a real RTL overflow and a sub-44px
   link in milestone 1 that type-checks and unit tests could not.
 
+- Ordered children (days in a plan, exercises in a day) get their position under a
+  row lock (`SELECT ... FOR UPDATE` on the parent) so simultaneous additions can't
+  collide; keep that for any new ordered collection. Another user's id is always a
+  404, never a 403 (`api/src/plans/ownership.ts` is the only way to look rows up).
+- The exercise -> plan_exercise foreign key is `DEFERRABLE INITIALLY DEFERRED`
+  (hand-edited into migration 0001; drizzle can't express it) so deleting a profile
+  can cascade through plans and custom exercises in one statement.
+
 ## Status
 
-Milestone 1 (foundation) in progress. Roadmap: `handoff/docs/spec.md`, "Build
+Milestone 1 (foundation) is live. Milestone 2 (exercise library and plan builder)
+is built; see `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach
 chat.

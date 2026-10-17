@@ -40,6 +40,16 @@ export const profileSchema = z.object({
 });
 export type Profile = z.infer<typeof profileSchema>;
 
+// Settings screen: language and unit, plus the display name. null clears the name.
+export const updateMeBodySchema = z
+  .object({
+    displayName: z.string().trim().min(1).max(80).nullable().optional(),
+    language: languageSchema.optional(),
+    weightUnit: weightUnitSchema.optional(),
+  })
+  .refine((body) => Object.keys(body).length > 0, { message: "at least one field is required" });
+export type UpdateMeInput = z.infer<typeof updateMeBodySchema>;
+
 export const profileResponseSchema = z.object({ profile: profileSchema });
 export type ProfileResponse = z.infer<typeof profileResponseSchema>;
 

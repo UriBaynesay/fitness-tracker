@@ -34,6 +34,7 @@ RUN npm ci --omit=dev --workspace=api --include-workspace-root \
 COPY --from=build /app/shared/dist shared/dist
 COPY --from=build /app/api/dist api/dist
 COPY --from=build /app/api/drizzle api/drizzle
+COPY --from=build /app/api/seed api/seed
 COPY --from=build /app/web/dist web/dist
 
 USER node

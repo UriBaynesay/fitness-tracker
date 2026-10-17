@@ -6,9 +6,9 @@
   "scripts": {
     "build": "npm run build -w shared && npm run build -w api && npm run build -w web",
     "dev": "npm run build -w shared && concurrently -n shared,api,web -c gray,blue,green \"npm run dev -w shared\" \"npm run dev -w api\" \"npm run dev -w web\"",
-    "test": "npm run build -w shared && npm test -w api && npm test -w web",
+    "test": "npm run build -w shared && npm test -w shared && npm test -w api && npm test -w web",
     "typecheck": "npm run build -w shared && npm run typecheck -w api && npm run typecheck -w web",
-    "db:generate": "npm run db:generate -w api",
+    "db:generate": "npm run build -w shared && npm run db:generate -w api",
     "db:migrate": "npm run db:migrate -w api"
   },
   "devDependencies": {

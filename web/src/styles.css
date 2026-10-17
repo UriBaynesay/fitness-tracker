@@ -212,3 +212,480 @@ a:focus-visible {
   background: var(--accent);
   color: var(--on-accent);
 }
+
+/* ---- milestone 2: navigation, plans, exercise picker ---------------------- */
+
+a.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-dashed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 52px;
+  border: 1px dashed var(--border);
+  background: none;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.screen-with-nav {
+  padding-block-end: calc(76px + 24px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  display: flex;
+  max-inline-size: 480px;
+  margin-inline: auto;
+  block-size: calc(76px + env(safe-area-inset-bottom));
+  padding-block-end: env(safe-area-inset-bottom);
+  padding-inline: 8px;
+  background: var(--bg);
+  border-block-start: 1px solid var(--border);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-block-size: 44px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.bottom-nav-item[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 44px;
+  text-decoration: none;
+}
+
+.rtl-flip {
+  /* set per direction below */
+}
+
+html[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.plan-header,
+.picker-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.plan-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+  padding-inline: 10px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-block-size: 44px;
+  padding-inline: 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.chip-add {
+  min-inline-size: 44px;
+  padding-inline: 0;
+  border-style: dashed;
+  background: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* One scrollable row, as in the design, instead of wrapping onto several lines.
+   The strip bleeds to the screen edges so it is clear there is more to scroll to. */
+.chips-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-inline: -20px;
+  padding-inline: 20px;
+  padding-block: 2px;
+  scrollbar-width: none;
+}
+
+.chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.chips-scroll .chip {
+  flex: none;
+}
+
+/* "2 of 3" must stay on one line however long the summary beside it is. */
+.position {
+  flex: none;
+  white-space: nowrap;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  inline-size: 100%;
+  min-block-size: 56px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+
+.list-row-button {
+  cursor: pointer;
+}
+
+.list-row-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.list-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.list-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.list-row-title {
+  font-size: 17px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.muted-small {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.card-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid var(--accent);
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.exercise-name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-inline-size: 0;
+}
+
+.field-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.input-compact {
+  min-block-size: 46px;
+  padding-inline: 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.hint {
+  display: block;
+  min-block-size: 18px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.hint-error {
+  color: var(--danger);
+}
+
+.hint-saved {
+  color: var(--accent);
+}
+
+.segmented-full {
+  align-self: stretch;
+}
+
+.segmented-full .segmented-option {
+  flex: 1;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-actions .btn {
+  min-block-size: 44px;
+}
+
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+}
+
+.confirm-question {
+  flex-basis: 100%;
+  font-weight: 500;
+}
+
+.confirm .btn {
+  min-block-size: 44px;
+}
+
+.options summary {
+  display: flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.options[open] summary {
+  margin-block-end: 12px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 52px;
+  padding-inline: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+}
+
+.search:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-input {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 17px;
+}
+
+.search-input:focus-visible {
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tag {
+  margin-inline-start: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.accent {
+  display: inline-flex;
+  color: var(--accent);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-block-size: 44px;
+}
+
+.check-row input {
+  inline-size: 24px;
+  block-size: 24px;
+  accent-color: var(--accent);
+}
+
+.sticky-action {
+  position: sticky;
+  inset-block-end: 0;
+  padding-block: 12px max(12px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.sticky-action .btn {
+  inline-size: 100%;
+}
