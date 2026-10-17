@@ -7,7 +7,7 @@ live at `https://fitness.v1vpa.duckdns.org`.
 
 This file supplements the project root [`../../CLAUDE.md`](../../CLAUDE.md) —
 its tutor / co-designer / builder role, pacing rules and guardrails apply here
-unchanged. Server-side facts (nginx, certificates, backups, `deploy.sh`) live in
+unchanged. Server-side facts (nginx, certificates, `deploy.sh`) live in
 [`../../infra/CLAUDE.md`](../../infra/CLAUDE.md).
 
 ## Source material
@@ -42,15 +42,14 @@ cookie. Open sign-up, rate-limited auth routes.
   is `auth_sessions` to avoid clashing with the spec's `workout_sessions`.)
 - **Only identity tables in milestone 1.** Plans, exercises, workout sessions and
   goals arrive with the milestone that first reads them.
+- **No nightly database backup.** The handoff lists one in milestone 1; the owner
+  does not want database backups for any app. Do not add or propose them.
 
 Everything else in the handoff brief stands as a working draft, open to being
 re-argued like any other decision in this project.
 
 ## Contracts with the infra repo (do not break)
 
-- Compose service for the database is named **`postgres`** and sets
-  `POSTGRES_USER` / `POSTGRES_DB`: `infra/backup/pg-backup.sh` dumps through
-  `docker compose exec postgres` using exactly those.
 - `api` publishes **`127.0.0.1:3001`** only; nginx is the sole public listener.
 - Migrations run **inside the production image**:
   `docker compose -f docker-compose.yml run --rm api node api/dist/db/migrate.js`.
