@@ -189,3 +189,105 @@ export const planExercises = pgTable(
 );
 
 export type PlanExerciseRow = typeof planExercises.$inferSelect;
+
+// ---- workouts --------------------------------------------------------------
+
+export const workoutSessions = pgTable(
+  "workout_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    // null for an ad-hoc workout, or once the plan day it came from is deleted:
+    // history must outlive the plan, so SET NULL rather than CASCADE.
+    planDayId: uuid("plan_day_id").references(() => planDays.id, { onDelete: "set null" }),
+    // The day's name when the workout started, so history keeps its label.
+    planDayName: text("plan_day_name"),
+    // Generated on the phone. A retry of the same upload finds this row instead of
+    // creating a second workout.
+    clientId: uuid("client_id").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    // null while the workout is in progress.
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    notes: text("notes"),
+  },
+  (t) => [
+    uniqueIndex("workout_sessions_profile_client_idx").on(t.profileId, t.clientId),
+    index("workout_sessions_profile_started_idx").on(t.profileId, t.startedAt.desc()),
+    check("workout_sessions_end_check", sql`${t.endedAt} is null or ${t.endedAt} >= ${t.startedAt}`),
+  ]
+);
+
+export type WorkoutSessionRow = typeof workoutSessions.$inferSelect;
+
+export const sessionExercises = pgTable(
+  "session_exercises",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => workoutSessions.id, { onDelete: "cascade" }),
+    // Same deferred check as plan_exercises (hand-edited into the migration).
+    exerciseId: uuid("exercise_id")
+      .notNull()
+      .references(() => exercises.id),
+    position: integer("position").notNull(),
+    skipped: boolean("skipped").notNull().default(false),
+    // A snapshot of the plan configuration at the time of the workout, so editing
+    // the plan later can never change how an old workout reads.
+    targetSets: integer("target_sets").notNull(),
+    targetReps: integer("target_reps"),
+    targetDurationSeconds: integer("target_duration_seconds"),
+    restSeconds: integer("rest_seconds").notNull(),
+    progressionMode: text("progression_mode", { enum: PROGRESSION_MODES }).notNull(),
+    failureTargetReps: integer("failure_target_reps"),
+    sessionsToConfirm: integer("sessions_to_confirm").notNull(),
+    weightStepKg: numeric("weight_step_kg", { precision: 6, scale: 3 }),
+  },
+  (t) => [
+    index("session_exercises_session_id_idx").on(t.sessionId),
+    index("session_exercises_exercise_id_idx").on(t.exerciseId),
+    check("session_exercises_sets_check", sql`${t.targetSets} between 1 and 20`),
+    check("session_exercises_rest_check", sql`${t.restSeconds} between 0 and 600`),
+    check("session_exercises_reps_check", sql`${t.targetReps} is null or ${t.targetReps} between 1 and 100`),
+    check(
+      "session_exercises_duration_check",
+      sql`${t.targetDurationSeconds} is null or ${t.targetDurationSeconds} between 5 and 3600`
+    ),
+    check(
+      "session_exercises_reps_xor_duration_check",
+      sql`(${t.targetReps} is null) <> (${t.targetDurationSeconds} is null)`
+    ),
+    check("session_exercises_mode_check", sql`${t.progressionMode} in (${inList(PROGRESSION_MODES)})`),
+    check(
+      "session_exercises_failure_check",
+      sql`${t.progressionMode} <> 'failure' or (${t.failureTargetReps} is not null and ${t.targetReps} is not null and ${t.failureTargetReps} > ${t.targetReps})`
+    ),
+    check("session_exercises_confirm_check", sql`${t.sessionsToConfirm} between 1 and 10`),
+  ]
+);
+
+export const setLogs = pgTable(
+  "set_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionExerciseId: uuid("session_exercise_id")
+      .notNull()
+      .references(() => sessionExercises.id, { onDelete: "cascade" }),
+    setNumber: integer("set_number").notNull(),
+    weightKg: numeric("weight_kg", { precision: 7, scale: 3 }),
+    reps: integer("reps"),
+    durationSeconds: integer("duration_seconds"),
+    toFailure: boolean("to_failure").notNull().default(false),
+    completedAt: timestamp("completed_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    uniqueIndex("set_logs_exercise_set_idx").on(t.sessionExerciseId, t.setNumber),
+    check("set_logs_number_check", sql`${t.setNumber} between 1 and 40`),
+    check("set_logs_weight_check", sql`${t.weightKg} is null or ${t.weightKg} between 0 and 1000`),
+    check("set_logs_reps_check", sql`${t.reps} is null or ${t.reps} between 1 and 1000`),
+    check("set_logs_duration_check", sql`${t.durationSeconds} is null or ${t.durationSeconds} between 1 and 36000`),
+    check("set_logs_reps_xor_duration_check", sql`(${t.reps} is null) <> (${t.durationSeconds} is null)`),
+  ]
+);

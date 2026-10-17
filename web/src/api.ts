@@ -2,11 +2,14 @@ import type {
   CreateExerciseInput,
   ErrorResponse,
   Exercise,
+  ExerciseHistory,
   LoginBody,
   Plan,
   PlanSummary,
   Profile,
   RegisterInput,
+  SessionSummary,
+  SyncSession,
   UpdateDayInput,
   UpdateMeInput,
   UpdatePlanExerciseInput,
@@ -22,7 +25,7 @@ export class ApiError extends Error {
   }
 }
 
-type Method = "GET" | "POST" | "PATCH" | "DELETE";
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
   let response: Response;
@@ -57,6 +60,16 @@ export const api = {
   exercises: {
     list: () => request<{ exercises: Exercise[] }>("GET", "/api/v1/exercises"),
     create: (body: CreateExerciseInput) => request<{ exercise: Exercise }>("POST", "/api/v1/exercises", body),
+    // Ids are sent in chunks by the caller; the server accepts up to 30 at once.
+    history: (ids: string[], limit = 1) =>
+      request<{ history: ExerciseHistory[] }>("GET", `/api/v1/exercises/history?ids=${ids.join(",")}&limit=${limit}`),
+  },
+
+  sessions: {
+    // Idempotent: sending the same workout again changes nothing, so retries are safe.
+    put: (session: SyncSession) => request<{ session: SessionSummary }>("PUT", `/api/v1/sessions/${session.clientId}`, session),
+    remove: (clientId: string) => request<void>("DELETE", `/api/v1/sessions/${clientId}`),
+    list: (limit = 100) => request<{ sessions: SessionSummary[] }>("GET", `/api/v1/sessions?limit=${limit}`),
   },
 
   plans: {

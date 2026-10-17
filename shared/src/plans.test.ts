@@ -4,6 +4,7 @@ import {
   createExerciseBodySchema,
   defaultPlanExerciseConfig,
   exerciseName,
+  nextDayAfter,
   planExerciseConfigFor,
   updatePlanExerciseBodySchema,
 } from "./plans.js";
@@ -89,6 +90,29 @@ describe("applying a partial update", () => {
   it("ignores undefined values but honours explicit nulls", () => {
     expect(applyPlanExerciseUpdate(repConfig(), { restSeconds: undefined }).restSeconds).toBe(90);
     expect(applyPlanExerciseUpdate(timedConfig(), { targetReps: null }).targetReps).toBeNull();
+  });
+});
+
+describe("nextDayAfter (the rotation Today offers)", () => {
+  const days = [{ id: "push" }, { id: "pull" }, { id: "legs" }];
+
+  it("offers the day after the last finished one", () => {
+    expect(nextDayAfter(days, "push")?.id).toBe("pull");
+    expect(nextDayAfter(days, "pull")?.id).toBe("legs");
+  });
+
+  it("wraps around after the last day", () => {
+    expect(nextDayAfter(days, "legs")?.id).toBe("push");
+  });
+
+  it("starts at the first day with no history, or when the last day no longer exists", () => {
+    expect(nextDayAfter(days, null)?.id).toBe("push");
+    expect(nextDayAfter(days, "deleted-day")?.id).toBe("push");
+  });
+
+  it("copes with a one-day plan and with no days", () => {
+    expect(nextDayAfter([{ id: "only" }], "only")?.id).toBe("only");
+    expect(nextDayAfter([], null)).toBeNull();
   });
 });
 

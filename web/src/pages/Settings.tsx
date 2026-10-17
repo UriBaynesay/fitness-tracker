@@ -7,6 +7,7 @@ import { TextField } from "../components/fields";
 import { ChevronStartIcon } from "../components/icons";
 import { LanguageToggle } from "../components/LanguageToggle";
 import { Screen } from "../components/Screen";
+import { readDeviceSettings, writeDeviceSettings, type DeviceSettings } from "../session/device";
 
 const UNITS: WeightUnit[] = ["kg", "lb"];
 
@@ -15,6 +16,7 @@ export function Settings() {
   const { state, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState(false);
+  const [device, setDevice] = useState<DeviceSettings>(readDeviceSettings);
   if (state.status !== "authenticated") return null;
   const { profile } = state;
 
@@ -66,6 +68,25 @@ export function Settings() {
         </div>
 
         <TextField label={t("settings.name")} value={profile.displayName ?? ""} onCommit={(displayName) => save({ displayName })} />
+      </section>
+
+      <section className="card form">
+        <h2 className="section-title">{t("settings.device")}</h2>
+        <p className="muted">{t("settings.deviceHint")}</p>
+        {(["sound", "vibration", "keepAwake"] as const).map((key) => (
+          <label key={key} className="check-row">
+            <input
+              type="checkbox"
+              checked={device[key]}
+              onChange={(event) => {
+                const next = { ...device, [key]: event.target.checked };
+                setDevice(next);
+                writeDeviceSettings(next);
+              }}
+            />
+            <span>{t(`settings.${key}`)}</span>
+          </label>
+        ))}
       </section>
 
       <section className="card form">

@@ -85,6 +85,9 @@ const planExerciseConfigBase = z.object({
   weightStepKg: z.number().min(0.25).max(50).nullable(),
 });
 export type PlanExerciseConfig = z.infer<typeof planExerciseConfigBase>;
+// The bare field set, for documents that carry a copy of the configuration (a
+// workout snapshots it). Cross-field rules still go through planExerciseConfigFor.
+export const planExerciseConfigFields = planExerciseConfigBase;
 
 // Whether reps or seconds are required depends on the exercise, which is data the
 // database can't see inside a CHECK constraint, so this one refinement is the single
@@ -218,3 +221,12 @@ export const updatePlanExerciseBodySchema = planExerciseConfigBase
 export type UpdatePlanExerciseInput = z.infer<typeof updatePlanExerciseBodySchema>;
 
 export const idParamsSchema = z.object({ id: z.uuid() });
+
+// The day Today should offer: the one after the most recently finished day, wrapping
+// around, or the first day when there is no usable history (nothing finished yet, or
+// that day has since been deleted). Pure, so Today can run it offline.
+export function nextDayAfter<T extends { id: string }>(days: T[], lastFinishedDayId: string | null): T | null {
+  if (days.length === 0) return null;
+  const last = lastFinishedDayId === null ? -1 : days.findIndex((day) => day.id === lastFinishedDayId);
+  return days[(last + 1) % days.length] ?? null;
+}

@@ -103,6 +103,13 @@ re-argued like any other decision in this project.
 ## Status
 
 Milestone 1 (foundation) is live. Milestone 2 (exercise library and plan builder)
-is built; see `git log`. Roadmap: `handoff/docs/spec.md`, "Build
+is merged, undeployed. Milestone 3 (live workout) is built on `feature/m3-workout`:
+local-first (workout lives in IndexedDB via Dexie, pushed through the idempotent
+`PUT /api/v1/sessions/:clientId`; sync retries on change, start-up, `online`),
+Today screen with plan rotation and week strip, guided set logging, rest timer from
+an end timestamp, resume after reload, skip/reorder/add mid-workout, summary. Device
+alert settings (sound, vibration, keep screen on) are per device in localStorage.
+The owner deploys once, after the whole app is finished (no per-milestone deploys).
+See `git log`. Roadmap: `handoff/docs/spec.md`, "Build
 roadmap". Never in the app: social features, nutrition tracking, payments, AI coach
 chat.

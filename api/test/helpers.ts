@@ -102,7 +102,7 @@ export function me(app: FastifyInstance, token?: string) {
 // CSRF guard requires, exactly as a browser would send it.
 export function call(
   app: FastifyInstance,
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   url: string,
   token?: string,
   payload?: unknown

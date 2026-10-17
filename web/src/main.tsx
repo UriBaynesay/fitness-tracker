@@ -15,12 +15,15 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App";
 import { AuthProvider } from "./auth/AuthContext";
+import { WorkoutProvider } from "./session/WorkoutContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <WorkoutProvider>
+          <App />
+        </WorkoutProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>
