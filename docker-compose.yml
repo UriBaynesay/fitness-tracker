@@ -21,8 +21,6 @@ services:
       postgres:
         condition: service_healthy
 
-  # The service must stay named "postgres" with POSTGRES_USER / POSTGRES_DB set:
-  # infra/backup/pg-backup.sh dumps through `docker compose exec postgres`.
   postgres:
     image: postgres:18-alpine
     restart: unless-stopped
